@@ -516,7 +516,7 @@ const dshPeers = Object.keys(pkg.peerDependencies ?? {}).filter(
 ok(dshPeers.length > 0, `声明 DSH peer 依赖（兼容性门禁）：${dshPeers.join(', ') || '缺失'}`)
 ok(pkg.publishConfig?.access === 'public', 'package.json 声明 publishConfig.access = public')
 ok(
-  typeof pkg.repository?.url === 'string' && pkg.repository.url.includes('github.com/hmilyld/dsh-beacon'),
+  typeof pkg.repository?.url === 'string' && pkg.repository.url.includes('github.com/hmilyld/dsh-plugins'),
   'package.json 声明 repository 指向公开仓库',
 )
 ok(

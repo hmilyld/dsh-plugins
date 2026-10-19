@@ -2,7 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/@hmilyld%2Fdsh-beacon?label=npm&color=blue)](https://www.npmjs.com/package/@hmilyld/dsh-beacon)
 [![license](https://img.shields.io/npm/l/@hmilyld%2Fdsh-beacon)](LICENSE)
-[![CI](https://github.com/hmilyld/dsh-beacon/actions/workflows/ci.yml/badge.svg)](https://github.com/hmilyld/dsh-beacon/actions/workflows/ci.yml)
+[![CI](https://github.com/hmilyld/dsh-plugins/actions/workflows/ci.yml/badge.svg)](https://github.com/hmilyld/dsh-plugins/actions/workflows/ci.yml)
 
 DSH（DeepSeek Harness）通知插件：当 **任务完成**，或 Agent 需要你做**选择 / 确认 / 审批**时，
 向指定 URL 推送一条 JSON webhook。适合接到企业微信、钉钉、Slack、Bark、ntfy 之类的接收端。
@@ -32,11 +32,13 @@ DSH（DeepSeek Harness）通知插件：当 **任务完成**，或 Agent 需要�
 # npm（推荐）
 dsh plugin --profile <name> add @hmilyld/dsh-beacon
 
-# 或从 GitHub 安装
-dsh plugin --profile <name> add github:hmilyld/dsh-beacon
+# 或从本仓库本地目录安装（先构建）
+dsh plugin --profile <name> add /absolute/path/to/DSHPlugins/packages/dsh-beacon
 ```
 
 安装后重启一次 DSH。卸载：`dsh plugin --profile <name> remove @hmilyld/dsh-beacon`。
+
+> monorepo 里的 GitHub 仓库根不是插件包，不能直接 `dsh plugin add github:hmilyld/dsh-plugins`；请用 npm、tarball 或本地绝对路径。
 
 > pnpm 默认会拦下安装脚本。从 npm 装的是已构建好的包，不受影响；从 GitHub 或本地目录安装时，
 > 若被拦，按 pnpm 提示把包名加入 `profiles/<name>/pnpm-workspace.yaml` 的 `allowBuilds` 后重试。
@@ -48,8 +50,8 @@ dsh plugin --profile <name> add github:hmilyld/dsh-beacon
 | 来源 | 填法 |
 | --- | --- |
 | npm 包名（推荐） | `@hmilyld/dsh-beacon` |
-| GitHub 仓库地址 | `github:hmilyld/dsh-beacon` |
-| 压缩包 | `hmilyld-dsh-beacon-<版本>.tgz` 的**绝对路径**（可从 [Releases](https://github.com/hmilyld/dsh-beacon/releases) 下载） |
+| 本仓库本地目录 | 已构建的 `packages/dsh-beacon` 绝对路径 |
+| 压缩包 | `hmilyld-dsh-beacon-<版本>.tgz` 的**绝对路径** |
 | 本地目录 | 已构建的插件目录**绝对路径** |
 
 安装后按页面提示重启，再到插件详情里填写 `webhookUrl`。

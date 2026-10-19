@@ -1,130 +1,104 @@
 # @hmilyld/dsh-ocgo-usage-dock
 
-DSH（DeepSeek Harness）**Web 插件**：在对话输入框下方独立一行显示 OpenCode Go 用量条（5 小时滚动窗口 / 本周窗口 / 本月窗口），并提供本插件设置页。适配 **DSH 0.2.0-rc.2**。
+DSH（DeepSeek Harness）Web 插件：在 **输入框上方整行** 显示 OpenCode Go 的 5 小时滚动、本周、本月用量，并在插件页提供配置。数据由 Host 侧的 Typert Remote 提供，密钥存放在 DSH 的 credentials 里，不写进 settings 文件。
 
 ```text
-[DSH 自带 token 用量行]（保持原位，不被挤动）
-OpenCode Go  ● 5h 29%  ● 周 94%  ● 月 69%        [⟳] [⚙]
+OpenCode Go 用量   5 小时 ▓▓▓░░ 29%   本周 ▓▓▓▓░ 84%   本月 ▓▓░░░ 46%   ⟳  ⚙
+[输入框]
 ```
 
-- 每个窗口默认显示**已用百分比**；鼠标悬停出现提示，包含**重置时间**（绝对时间 + 剩余时长），方便控制用量。
-- 彩点健康度：< 60% 绿、60–85% 黄、≥ 85% 红。
-- 数据来自 OpenCode 官方用量接口（纯元数据），不消耗任何模型 token。
-- 未配置 API Key 时输入框下方**不显示**任何内容（静默）。
-- 点 ⟳ 立即穿透 5 分钟缓存刷新；点 ⚙ 打开设置面板并定位到插件页。
+- 鼠标悬停任一窗口可看重置时间。
+- 颜色健康度：< 60% 绿、60–85% 黄、≥ 85% 红。
+- 未配置密钥时整行**不渲染**；接口失败时显示错误与重试按钮，不会打断对话。
+- 用量请求只读 OpenCode Go 的元数据接口，不消耗模型 token。
+- 插件页设置保存后即时生效；刷新间隔、超时、接口地址都可改。
+
+## 环境
+
+- Node `^22.19.0 || >=24.0.0`
+- DSH `>=0.2.0-rc.2 <0.3.0`
+- pnpm `12.5.1`（仅从源码构建时需要）
 
 ## 安装
 
-要求 Node ≥ 20、DSH 0.2.0-rc.2（`dsh --version`）。
+### 从 npm（推荐）
 
 ```bash
-# 1. 获取代码（clone 到任意目录，eg: ~/Codespace）
-git clone https://github.com/hmilyld/dsh-ocgo-usage-dock.git
-cd dsh-ocgo-usage-dock
-
-# 2. 安装依赖（首次必做；本地路径安装时插件按包目录真实路径解析依赖）
-npm install
-
-# 3. 装进 web profile
-dsh plugin --profile web add "$(pwd)"
-
-# 4. 校验组合（不启动 app）
-dsh --profile web --dump-config | grep -A8 ocgo-usage-dock
-
-# 5. 启动 / 重启 dsh web，输入框下方出现用量条
-dsh web
+dsh plugin --profile web add @hmilyld/dsh-ocgo-usage-dock
 ```
 
-升级本插件：先在插件页停用/卸载旧版（或 `dsh plugin --profile web remove @hmilyld/dsh-ocgo-usage-dock`），然后重复 2–3 步重启 `dsh web`。
+### 从本仓库本地安装
 
-**换仓 / 更名后的干净重装**：如果 profile 里残留旧名字的行（`dsh-ocgo-usage-dock`），重新安装不会自愈——需要在 `~/.dsh/profiles/web/package.json` 里手工删掉旧依赖键与 bundles 行，再重装（症状：启动日志出现 duplicate loader entry）。
-
-## 配置项
-
-| 字段 | 默认值 | 说明 |
-| --- | --- | --- |
-| API Key | （空） | OpenCode Go API Key；留空则按优先级自动解析（见下） |
-| 刷新间隔（秒） | `300` | 自动轮询间隔；设置页按"秒"编辑，最小 10 秒 |
-| 请求超时（秒） | `15` | 单次请求等待上限；最小 1 秒 |
-| 接口地址 | `https://opencode.ai/zen/go/v1/usage` | 用量接口地址（一般不用改） |
-
-配置入口：所有字段都在插件设置页表单里（见下）。全部支持热修改（保存即生效，无需重启）。
-
-### API Key 的解析优先级
-
-每次请求前按序尝试、命中即停：
-
-1. 插件设置里填的 API Key；
-2. 启动 dsh 前的环境变量 `OPENCODE_GO_API_KEY`；
-3. 环境变量 `OPENCODE_API_KEY`；
-4. DSH 凭据库（`$DSH_HOME/.credentials.yaml`）里的 `OPENCODE_GO_API_KEY` 条目。
-
-API Key 的值**不会**回显到任何页面或 API 响应里（write-only，只写不读）。
-
-### API Key 获取
-
-1. 登录 OpenCode Web 控制台；
-2. 在 **API Keys / 设置** 页创建一个 Key；
-3. 复制后：直接在插件设置页填（推荐），或导出环境变量：
+先构建，再把包目录的绝对路径交给 DSH：
 
 ```bash
-export OPENCODE_GO_API_KEY='你的 key'
-dsh web
+pnpm install
+pnpm --filter @hmilyld/dsh-ocgo-usage-dock run build
+dsh plugin --profile web add /absolute/path/to/DSHPlugins/packages/dsh-ocgo-usage-dock
 ```
 
-## 设置页使用
-
-**唯一入口**：侧边栏 **插件（Plugins）** → 点开 **OpenCode Go 用量** 插件卡片 → 页面内的表单。
-
-1. 修改字段（API Key 是密码输入框；间隔/超时以秒编辑）；
-2. 按 **保存**，按钮短暂显示"保存中…"；
-3. 成功后配置**立即生效**：自动重建轮询定时器、清掉旧缓存、马上请求一次新数据——**无需重启 `dsh web`**；
-4. 无效输入（刷新间隔 < 10 秒、超时 < 1 秒、地址为空）会被卡片拦截并提示，不会保存。
-
-快速验证：
+装完重启一次 `dsh web`。卸载：
 
 ```bash
-dsh --profile web --dump-config | grep -A9 ocgo-usage-dock
-# 期望看到 id: ocgo-usage-dock 与 config 段（apiKey/refreshIntervalMs/timeoutMs/baseUrl）
+dsh plugin --profile web remove @hmilyld/dsh-ocgo-usage-dock
 ```
 
-### 用量条操作
+## 配置
 
-- **⟳**：立即刷新（绕过 5 分钟服务端缓存）；加载中显示 `…` 且禁用；
-- **⚙**：打开设置面板并定位到插件页（即上面的设置入口）。
+打开 **插件 → @hmilyld/dsh-ocgo-usage-dock**。
+
+| 字段 | 说明 |
+| --- | --- |
+| 凭证引用 | 保存密钥的环境变量/credential 名称，默认 `OPENCODE_GO_API_KEY`。Host 每次请求都会重新解析。 |
+| API Key | 写入 DSH credentials 的密钥，不进入 settings 文件。留空表示保持当前密钥。 |
+| 刷新间隔（秒） | 用量条的取数频率，最小 10 秒，默认 300 秒。 |
+| 请求超时（秒） | 单次请求上限，最小 1 秒，默认 15 秒。 |
+| 用量接口地址 | 默认 `https://opencode.ai/zen/go/v1/usage`，一般不用改。 |
+
+### 密钥解析顺序
+
+Host 按以下顺序取第一个非空值：
+
+1. 旧版 `apiKey` 配置（deprecated，仅为兼容已保存的 profile）；
+2. `process.env[apiKeyEnv]`；
+3. 历史环境变量 `OPENCODE_GO_API_KEY` / `OPENCODE_API_KEY`；
+4. DSH credentials 中 `apiKeyEnv` 对应的值。
+
+如果设置页出现「当前配置仍在使用已弃用的 apiKey 字段」，说明第 1 步仍然命中。先把密钥写入上面的 **API Key** 字段并保存，再点 **清除旧版密钥**，之后就会使用 credentials。
 
 ## 常见问题
 
-### 用量条不显示
+**用量条显示 401**
 
-- **没配 Key**：插件设置页填好 Key 并保存，然后点用量条上的 ⟳；全链路都没有 Key 时本插件保持静默（这是设计行为，不是故障）；
-- **还没请求过**：等下一次轮询（默认 5 分钟）或点 ⟳。
+OpenCode Go 返回的是 `api_key_expired` 或类似认证错误，说明当前密钥已过期或没有权限。到 OpenCode Console 重新生成密钥，在设置页的 **API Key** 写入并保存，或更新对应的环境变量。
 
-### 数值一直不更新 / 错误行
+**用量条完全不显示**
 
-- 错误行只会在**真实失败**时出现（超时 / 网络不通 / 接口响应非 2xx），并带"重试"按钮；
-- 接口地址别改错——默认 `https://opencode.ai/zen/go/v1/usage`；
-- 宿主进程级代理需在启动 dsh 前 `export HTTPS_PROXY=…`（请求从 dsh 进程发出，浏览器不参与）；
-- 修改设置里的字段（比如换了 Key 或间隔）保存后立即生效——不需要重启。
+- 没配置可用密钥时这是预期行为（静默隐藏）。
+- 确认插件在 **插件 → 包含的组件** 里是「运行中」。
+- 打开浏览器开发者工具，确认 `POST /api/ocgoUsage/snapshot` 返回 200；如果 404/500，检查 `lib/typert.host.js` 是否随包发布。
 
-### 点击 ⚙ 没有反应 / 没定位到插件页
+**修改设置后不生效**
 
-设置面板会被打开；如果没自动落到"插件"页（其他对话框挡住、或侧栏折叠），手动点一下导航里的"插件"即可。
+设置页需要点 **保存**。保存后 Host 会清掉旧缓存并在下一次请求使用新值；用量条也可能在下一次轮询才更新。
 
-### 安装后启动日志出现 `entry did not activate ... failed to import`
+## 实现
 
-本地路径安装时插件按**包目录**解析依赖——第一次安装前必须先在包目录 `npm install`（依赖在 `devDependencies` 里声明）；漏了这步会出现这个告警，补跑 `npm install` 后重启 `dsh web` 即可。
+- **Host**：`src/index.ts` 默认导出一个 `TypertRemoteService`，提供 `ocgoUsage/snapshot`。`src/usage.ts` 负责配置展开、密钥解析、响应归一化、超时/网络错误折叠；缓存按当前刷新间隔失效，并发请求 single-flight。
+- **Client**：`src/client/index.tsx` 先 `ctx.remote.$mount(./remote)`，再用 `ctx.inject(['remote.ocgoUsage', ...])` 等命名空间就绪；一个 controller 统一管理设置表单、credentials 状态和唯一一条轮询。`UsageDock` 注册到 `conversation.input.dock`，`SettingsCard` 注册到 `plugins.bundle.config`。
+- **生成**：`@Remote` 方法由官方 Typert 生成器产出 `lib/typert.host.*` 与 `lib/typert.remote-client.*`，客户端 bundle 直接包含生成的 Remote 与 zod schema。
 
-### 停用 / 重新启用后
+## 开发
 
-停用插件会清掉用量条与非持久副作用（定时器等），设置保留；重新启用后自动恢复。
+```bash
+pnpm install
+pnpm --filter @hmilyld/dsh-ocgo-usage-dock run typecheck
+pnpm --filter @hmilyld/dsh-ocgo-usage-dock run build
+pnpm --filter @hmilyld/dsh-ocgo-usage-dock run test
+```
 
-## 数据说明
-
-- 用量数据实时从 OpenCode 拉取并缓存 5 分钟；不采集、不回传任何本地数据；
-- API Key 只保存在宿主进程与你的 profile 文件里，浏览器端永不可见；
-- 请求需要浏览器式 User-Agent（本插件已自动处理，拦截的是非浏览器客户端）。
+构建顺序（package script 已串好）：Host `tsc` → Typert 生成 → Client `tsc` → esbuild bundle。
 
 ## License
 
-MIT（见 [LICENSE](./LICENSE)）。
+MIT

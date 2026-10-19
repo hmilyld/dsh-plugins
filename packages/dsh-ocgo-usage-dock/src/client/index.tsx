@@ -1,0 +1,90 @@
+/**
+ * Browser entry for the usage dock.
+ *
+ * The generated Remote contribution is mounted once per Client plugin; a
+ * scoped injection then waits for the namespace it created before the UI
+ * controller touches `ctx.remote.ocgoUsage`. Both slot registrations wait for
+ * the Host to serve the entry's settings namespace, so a profile that does not
+ * load the Host half shows no trace of the dock or the card.
+ */
+import type { Context } from '@deepseek-ai/cordis'
+import type {} from '@deepseek-ai/dsh-api-remotes/client'
+import type {} from '@deepseek-ai/dsh-client-locale/client'
+import type {} from '@deepseek-ai/dsh-client-ui-conversation/client'
+import type {} from '@deepseek-ai/dsh-client-ui-plugin-manager/client'
+import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
+import type {} from '@deepseek-ai/dsh-client-ui-settings/client'
+import ocgoRemote from '@hmilyld/dsh-ocgo-usage-dock/remote'
+import { OcgoClientController, ENTRY_ID, PACKAGE_NAME } from './controller.ts'
+import { SettingsCard } from './SettingsCard.tsx'
+import { UsageDock } from './UsageDock.tsx'
+import { en, NS, zh } from './locales.ts'
+
+/** `remote` alone is enough to mount the contribution; the namespace is scoped below. */
+export const inject = ['remote']
+
+/**
+ * Mount the Remote contribution, then wait for its namespace before wiring UI.
+ * @param ctx - Client plugin context.
+ * @returns the Remote contribution disposer.
+ */
+export async function apply(ctx: Context): Promise<() => Promise<void>> {
+  const disposeRemote = await ctx.remote.$mount(ocgoRemote)
+  const ui = ctx.inject(
+    ['remote.ocgoUsage', 'remote.credentials', 'slots', 'locale', 'configForms', 'pluginNavigation'],
+    (scoped) => {
+      mountUi(scoped)
+    },
+  )
+  try {
+    await ui
+  } catch (error) {
+    await ui.dispose()
+    await disposeRemote()
+    throw error
+  }
+  return async () => {
+    await ui.dispose()
+    await disposeRemote()
+  }
+}
+
+/** Register the controller, dictionaries, and both slots on the scoped context. */
+function mountUi(ctx: Context): void {
+  const controller = new OcgoClientController(ctx)
+  ctx.effect(() => () => controller.dispose(), 'ocgo-usage-dock: controller')
+  ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ocgo-usage-dock: dictionaries')
+  ctx.effect(
+    () =>
+      ctx.configForms.whileServed([ENTRY_ID], () => {
+        const offDock = ctx.slots.inject('conversation.input.dock', () =>
+          ctx.slots.register(
+            {
+              name: 'conversation.input.dock',
+              id: 'ocgo-usage-dock',
+              order: 10,
+              locale: NS,
+              inject: () => controller.dockFace(),
+            },
+            UsageDock,
+          ),
+        )
+        const offSettings = ctx.slots.inject('plugins.bundle.config', () =>
+          ctx.slots.register(
+            {
+              name: 'plugins.bundle.config',
+              key: PACKAGE_NAME,
+              locale: NS,
+              inject: () => controller.settingsFace(),
+            },
+            SettingsCard,
+          ),
+        )
+        return () => {
+          offSettings()
+          offDock()
+        }
+      }),
+    'ocgo-usage-dock: slots',
+  )
+}

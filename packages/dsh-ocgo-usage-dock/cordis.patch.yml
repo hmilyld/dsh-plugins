@@ -1,18 +1,18 @@
-# dsh-ocgo-usage-dock bundle 层：`dsh plugin --profile web add 本包` 时把插件行
-# 插入 profile 组合（package.json 的 dsh.bundle.patch 指向本文件）。
+# dsh-ocgo-usage-dock bundle layer.
 #
-# 三处 id 一致性铁律（改任何一处都要同步其余两处，否则 loading 循环）：
-#   1. 本文件的 id（也是设置分区命名空间 NS）
-#   2. lib/index.js 导出的 name
-#   3. README 示例里的 id
+# `id` is both the Loader entry id and the settings namespace served to the
+# browser half. `name` must match package.json. Defaults live on the Schemastery
+# fields in src/config.ts; this row only shows the shape a profile may override.
 #
-# apiKey 默认留空，插件静默停用（Client 半边不渲染任何内容）；填好保存后
-# 立即生效，无需重启 dsh web。
+# apiKey is the deprecated compatibility field. New configurations should leave
+# it empty and use apiKeyEnv + the credentials field in the plugin's settings
+# page, so the secret never enters the settings document.
 - insert:
     - id: ocgo-usage-dock
       name: '@hmilyld/dsh-ocgo-usage-dock'
       config:
         apiKey: ''
+        apiKeyEnv: OPENCODE_GO_API_KEY
         refreshIntervalMs: 300000
         timeoutMs: 15000
-        baseUrl: 'https://opencode.ai/zen/go/v1/usage'
+        baseUrl: https://opencode.ai/zen/go/v1/usage

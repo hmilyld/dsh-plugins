@@ -1,0 +1,40 @@
+packages:
+  - packages/*
+  - tooling/*
+
+catalog:
+  # Shared build-time tooling.
+  "@changesets/cli": "^3.0.3"
+  "@deepseek-ai/dsh-typert-generator": "0.2.0-rc.2"
+  "@types/node": "^24.19.1"
+  "@types/react": "^18.3.31"
+  "@types/react-dom": "^18.3.7"
+  esbuild: "^0.28.2"
+  react: "^18.3.1"
+  react-dom: "^18.3.1"
+  typescript: "6.0.3"
+
+  # DSH platform packages the plugins build against. Kept at the exact release
+  # the local dsh installation ships so the compiled types match the runtime.
+  "@deepseek-ai/cordis": "~4.0.4"
+  "@deepseek-ai/cosmokit": "^1.8.5"
+  "@deepseek-ai/schemastery": "^3.18.4"
+  "@deepseek-ai/dsh-agent": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-api-remotes": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-client-locale": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-client-store": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-client-ui-conversation": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-client-ui-primitives": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-client-ui-renderer": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-client-ui-settings": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-client-ui-slots": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-credentials": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-llm": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-session": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-settings": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-tool-ask-user": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-user-approval": "0.2.0-rc.2"
+  "@deepseek-ai/dsh-user-questions": "0.2.0-rc.2"
+  zod: "4.4.3"

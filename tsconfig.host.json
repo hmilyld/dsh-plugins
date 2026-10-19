@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./packages/dsh-beacon" },
+    { "path": "./packages/dsh-ocgo-usage-dock" }
+  ]
+}

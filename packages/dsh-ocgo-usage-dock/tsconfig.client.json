@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.base.client.json",
+  "compilerOptions": {
+    "rootDir": "src/client",
+    "outDir": "lib/types/client",
+    "paths": {
+      "@hmilyld/dsh-ocgo-usage-dock/remote": ["./lib/typert.remote-client.d.ts"],
+      "@hmilyld/dsh-ocgo-usage-dock/types": ["./lib/types/types.d.ts"]
+    }
+  },
+  "include": ["src/client/**/*.ts", "src/client/**/*.tsx"]
+}

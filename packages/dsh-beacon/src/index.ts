@@ -93,7 +93,7 @@ export const Config = Schema.object({
 
 /** 编译期自检：schema 的校验输出必须与上面的 `Config` 接口一致（volatile 字段输出为 `Volatile<T>`）。 */
 type Assert<T extends true> = T
-type _ConfigMatchesSchema = Assert<
+export type ConfigMatchesSchema = Assert<
   Schemastery.TypeT<typeof Config> extends Config
     ? Config extends Schemastery.TypeT<typeof Config>
       ? true

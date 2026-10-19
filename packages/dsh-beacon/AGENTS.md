@@ -1,5 +1,9 @@
 # AGENTS.md
 
+> 本包已迁入 `@hmilyld/dsh-plugins` monorepo。构建、类型检查、测试、发布以根目录
+> [`AGENTS.md`](../../AGENTS.md) 与 [`docs/plugin-standard.md`](../../docs/plugin-standard.md) 为准；
+> 下文保留的细节若与根目录冲突，以根目录为准。
+
 本文件面向在本仓库工作的编码 agent 与维护者，记录架构、开发、测试与发版约定。
 使用者文档见 [README.md](README.md)。
 
@@ -13,7 +17,7 @@
 | 客户端 | `src/client/index.tsx` | `lib/client.js` | 插件管理页上的配置表单 |
 
 技术栈：TypeScript + `@deepseek-ai/cordis`（插件/服务）+ `@deepseek-ai/schemastery`（Config schema）
-+ `@deepseek-ai/cosmokit`（`isVolatile`）。开发对照 DSH `0.2.1-rc.2` 的类型包。
++ `@deepseek-ai/cosmokit`（`isVolatile`）。开发对照 DSH `0.2.0-rc.2` 的类型包。
 
 ## 关键标识符（改名或换 scope 时必须同步）
 
@@ -36,8 +40,8 @@
 ```
 src/index.ts                     宿主插件：volatile Config schema、render/sendWebhook、全部触发监听
 src/client/index.tsx             客户端配置表单（plugins.bundle.config 插槽）
-scripts/build-client.mjs         esbuild 打包客户端 → lib/client.js（ModuleLoader 包装）
-scripts/smoke-test.mjs           冒烟测试（npm test）
+../../tooling/build/build-client.mjs  esbuild 打包客户端 → lib/client.js（ModuleLoader 包装，monorepo 共享）
+scripts/smoke-test.mjs           冒烟测试（pnpm test）
 scripts/send-test.mjs            真实端点联调（npm run send-test）
 scripts/send-test.config.json    联调配置，git-ignored，含真实地址/密钥
 cordis.patch.yml                 bundle 层：安装时向 profile 插入插件行（id=dsh-beacon, name=包名）
@@ -110,14 +114,14 @@ lib/                             构建产物，git-ignored
 ## 开发
 
 ```bash
-npm install --legacy-peer-deps   # dsh rc 系列包之间有 peer 冲突，需要这个旗标
-npm run typecheck                # tsc --noEmit（宿主）+ tsc -p tsconfig.client.json（客户端）
-npm test                         # build + 冒烟测试
-npm run build                    # tsc → lib/ + esbuild → lib/client.js
-npm run send-test                # 可选：向真实端点发四类事件
+pnpm install                                  # 在 monorepo 根目录
+pnpm --filter @hmilyld/dsh-beacon run typecheck
+pnpm --filter @hmilyld/dsh-beacon run test    # build + 冒烟测试
+pnpm --filter @hmilyld/dsh-beacon run build   # tsc → lib/ + esbuild → lib/client.js
+pnpm --filter @hmilyld/dsh-beacon run send-test  # 可选：向真实端点发四类事件
 ```
 
-- 本机调试用 `dsh plugin --profile <name> add /path/to/dsh-beacon`（pnpm `link:` 符号链接）。
+- 本机调试用 `dsh plugin --profile <name> add <绝对路径>/packages/dsh-beacon`（pnpm `link:` 符号链接）。
   改完宿主代码后重启一次 DSH；客户端 bundle 改动同样以重启为最可靠。
 - 客户端产物必须是 `window.__ModuleLoader__.load({ id: <包名>, factory })` 包装，
   `@deepseek-ai/*` 与 react 全部 external（跨插件只能通过 cordis 服务协作）。
