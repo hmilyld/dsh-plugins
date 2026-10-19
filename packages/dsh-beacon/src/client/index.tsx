@@ -36,6 +36,7 @@ import type {
   SettingsFormScope,
   SettingsFormShell,
 } from '@deepseek-ai/dsh-client-ui-primitives'
+import { createUpdateStore, UpdateNotice, type UpdateStatus } from '@hmilyld/dsh-plugin-updates'
 
 // ---------------------------------------------------------------- 服务形状
 
@@ -112,6 +113,16 @@ const INVALID_LABEL = '这个值不合法，保存被拦下了。'
 
 /** 一页说明：`view === 'summary'` 时插件管理页只要这一行。 */
 const DESCRIPTION = '任务完成、Agent 提问、计划确认、工具审批时向预设地址推送提醒。'
+
+/** 更新提示链接到本包的 CHANGELOG。 */
+const CHANGELOG_URL =
+  'https://github.com/hmilyld/dsh-plugins/blob/main/packages/dsh-beacon/CHANGELOG.md'
+
+/** 更新提示文案。 */
+const UPDATE_LABELS = {
+  available: '发现新版本 v{latest}（当前 v{current}）。',
+  changelog: '查看更新说明',
+}
 
 /** 与宿主 `Config` 同构的 section 视图（describe 镜像里已是普通值）。 */
 interface BeaconConfig {
@@ -345,6 +356,10 @@ function ToggleField(props: {
 class BeaconController {
   private readonly form: SettingsFormModel<BeaconConfig>
   private readonly store
+  private readonly updates = createUpdateStore({
+    packageName: BUNDLE_KEY,
+    currentVersion: __PKG_VERSION__,
+  })
 
   constructor(scope: SettingsFormScope<BeaconConfig>) {
     this.form = new SettingsFormModel<BeaconConfig>(scope, [
@@ -356,6 +371,7 @@ class BeaconController {
       booleanSpec('skipSubagents'),
     ])
     this.store = this.form.bind(() => this.projection())
+    void this.updates.refresh(false)
   }
 
   /** 把 shell 与六个字段一起投影成一个可被 selector 读的快照。 */
@@ -374,7 +390,7 @@ class BeaconController {
   /** 插槽 entry 的 inject face：`hooks.beaconCard` → 组件的 `useBeaconCard`。 */
   face() {
     return {
-      hooks: { beaconCard: this.store },
+      hooks: { beaconCard: this.store, update: this.updates },
       ...this.form.actions(),
     }
   }
@@ -393,12 +409,14 @@ class BeaconController {
 function BeaconCard(props: {
   view?: 'summary' | 'page'
   useBeaconCard: (selector: (value: BeaconCardState) => BeaconCardState) => BeaconCardState
+  useUpdate: (selector: (value: UpdateStatus) => UpdateStatus) => UpdateStatus
   edit: SettingsFormActions['edit']
   resetField: SettingsFormActions['resetField']
   save: SettingsFormActions['save']
   discard: SettingsFormActions['discard']
 }) {
   const state = props.useBeaconCard((value) => value)
+  const update = props.useUpdate((value) => value)
   if (props.view === 'summary') return <>{DESCRIPTION}</>
   const disabled = !state.writable || state.saving
   const edit =
@@ -417,6 +435,7 @@ function BeaconCard(props: {
       onSave={props.save}
       onDiscard={props.discard}
     >
+      <UpdateNotice state={update} changelogUrl={CHANGELOG_URL} labels={UPDATE_LABELS} />
       <SettingsValueField
         id="plugin-config-dsh-beacon-url"
         label="Webhook 地址"

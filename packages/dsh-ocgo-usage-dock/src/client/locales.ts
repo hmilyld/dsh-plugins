@@ -56,6 +56,8 @@ export type OcgoLocaleKey =
   | 'saving'
   | 'saveFailed'
   | 'invalidNumber'
+  | 'updateAvailable'
+  | 'updateChangelog'
 
 /** English copy. */
 export const en: Record<OcgoLocaleKey, string> = {
@@ -105,6 +107,8 @@ export const en: Record<OcgoLocaleKey, string> = {
   saving: 'Saving…',
   saveFailed: 'The deployment did not accept these values; they were left for you to correct.',
   invalidNumber: 'Enter a number, or leave blank to use the default.',
+  updateAvailable: 'A newer release v{latest} is available (running v{current}).',
+  updateChangelog: 'View release notes',
 }
 
 /** Simplified Chinese copy. */
@@ -155,6 +159,8 @@ export const zh: Record<OcgoLocaleKey, string> = {
   saving: '保存中…',
   saveFailed: '本部署没有接受这些值，已保留供你修改。',
   invalidNumber: '请填数字；留空表示使用默认值。',
+  updateAvailable: '发现新版本 v{latest}（当前 v{current}）。',
+  updateChangelog: '查看更新说明',
 }
 
 /**

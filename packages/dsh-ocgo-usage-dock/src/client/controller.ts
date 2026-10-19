@@ -26,6 +26,7 @@ import {
   type SettingsFormShell,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { UsageSnapshot } from '@hmilyld/dsh-ocgo-usage-dock/types'
+import { createUpdateStore, type UpdateStore } from '@hmilyld/dsh-plugin-updates'
 import {
   DEFAULT_API_KEY_ENV,
   DEFAULT_REFRESH_INTERVAL_MS,
@@ -39,6 +40,10 @@ export const ENTRY_ID = 'ocgo-usage-dock'
 
 /** Bundle package name keyed by the Plugins page's bundle card. */
 export const PACKAGE_NAME = '@hmilyld/dsh-ocgo-usage-dock'
+
+/** Per-package changelog linked from the update notice. */
+export const CHANGELOG_URL =
+  'https://github.com/hmilyld/dsh-plugins/blob/main/packages/dsh-ocgo-usage-dock/CHANGELOG.md'
 
 /** Form field that stages the write-only credential. */
 const SECRET_FIELD = 'apiKeyDraft'
@@ -78,6 +83,7 @@ export interface SettingsState extends SettingsFormShell {
 export interface DockFace {
   hooks: {
     usageDock: Store<UsageDockState>
+    update: UpdateStore
   }
   refresh: () => void
   openSettings: () => void
@@ -87,6 +93,7 @@ export interface DockFace {
 export interface SettingsFace extends SettingsFormActions {
   hooks: {
     settings: Store<SettingsState>
+    update: UpdateStore
   }
   clearLegacyKey: () => void
 }
@@ -122,6 +129,10 @@ export class OcgoClientController {
     snapshot: null,
     loading: false,
     transportError: null,
+  })
+  private readonly updateStore = createUpdateStore({
+    packageName: PACKAGE_NAME,
+    currentVersion: __PKG_VERSION__,
   })
 
   private readonly settingsStore: WritableStore<SettingsState>
@@ -164,12 +175,13 @@ export class OcgoClientController {
     this.publish()
     void this.readCredential()
     void this.refresh(false)
+    void this.updateStore.refresh(false)
   }
 
   /** The dock slot's injected face. */
   dockFace(): DockFace {
     return {
-      hooks: { usageDock: this.dockStore },
+      hooks: { usageDock: this.dockStore, update: this.updateStore },
       refresh: () => {
         void this.refresh(true)
       },
@@ -183,7 +195,7 @@ export class OcgoClientController {
   settingsFace(): SettingsFace {
     const actions = this.form.actions()
     return {
-      hooks: { settings: this.settingsStore },
+      hooks: { settings: this.settingsStore, update: this.updateStore },
       edit: actions.edit,
       resetField: actions.resetField,
       save: actions.save,

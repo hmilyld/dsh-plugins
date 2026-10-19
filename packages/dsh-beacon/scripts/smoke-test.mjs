@@ -581,6 +581,11 @@ if (clientSource !== null) {
       && clientExports.inject.includes('configForms'),
     '客户端 bundle 声明 slots / configForms 注入',
   )
+  ok(
+    clientSource.includes('registry.npmjs.org')
+      && clientSource.includes('blob/main/packages/dsh-beacon/CHANGELOG.md'),
+    '客户端 bundle 带有 npm 更新检测',
+  )
 }
 
 // ---------------------------------------------------------------- 收尾

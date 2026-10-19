@@ -5,6 +5,7 @@
   },
   "files": [],
   "references": [
+    { "path": "./packages/dsh-plugin-updates" },
     { "path": "./packages/dsh-beacon/tsconfig.client.json" },
     { "path": "./packages/dsh-ocgo-usage-dock/tsconfig.client.json" }
   ]

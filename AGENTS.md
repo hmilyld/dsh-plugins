@@ -23,6 +23,7 @@ pnpm --filter @hmilyld/dsh-ocgo-usage-dock run test
 
 - `packages/dsh-beacon`：无 Typert Remote 的简单 Host + Client 插件参考。
 - `packages/dsh-ocgo-usage-dock`：Typert Remote + credentials + 两个 slot 的完整参考。
+- `packages/dsh-plugin-updates`：所有插件共用的 npm 更新检测（`createUpdateStore` + `UpdateNotice`）。
 - `tooling/build/build-client.mjs`：共享 esbuild 客户端打包器（ModuleLoader 包装）。
 - `tooling/build/generate-typert.mjs`：调用官方 Typert 生成器，输出 `lib/typert.*`。
 - `tsconfig.host.json` / `tsconfig.client.json`：根聚合，生成器靠它们发现 `packages/*`。
@@ -36,6 +37,8 @@ pnpm --filter @hmilyld/dsh-ocgo-usage-dock run test
 - 不把 secret 写进 settings；用 `apiKeyEnv` + `ctx.credentials` / `SettingsSecretField`。
 - 不在客户端直接操作 DOM 或做设置页导航；用官方 slot 与 `ctx.pluginNavigation`。
 - `remote.<namespace>` 必须用 `ctx.inject([...])` 等待 `$mount` 之后的服务；顶层 `inject` 只能写 `remote`。
+- 每个插件的设置页都必须展示更新提示：用 `@hmilyld/dsh-plugin-updates` 的 `createUpdateStore` + `UpdateNotice`，版本取 `__PKG_VERSION__`，链接到本包 `CHANGELOG.md`。
+- 每个用户可见改动都要有 changeset；`CHANGELOG.md` 必须进 `files`，所有包统一从本仓库发布到 npm。
 
 ## 常见的坑
 

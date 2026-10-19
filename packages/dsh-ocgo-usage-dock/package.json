@@ -29,6 +29,7 @@
     "./package.json": "./package.json"
   },
   "files": [
+    "CHANGELOG.md",
     "cordis.patch.yml",
     "lib/client.js",
     "lib/typert.host.js",
@@ -94,6 +95,7 @@
   "dependencies": {
     "@deepseek-ai/cosmokit": "catalog:",
     "@deepseek-ai/schemastery": "catalog:",
+    "@hmilyld/dsh-plugin-updates": "workspace:^",
     "zod": "catalog:"
   },
   "devDependencies": {

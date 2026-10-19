@@ -319,6 +319,8 @@ await test('client bundle uses the DSH module-loader wrapper and bundles the Rem
   assert.match(client, /ocgoUsage\/snapshot/)
   assert.match(client, /conversation\.input\.dock/)
   assert.match(client, /plugins\.bundle\.config/)
+  assert.match(client, /registry\.npmjs\.org/)
+  assert.ok(client.includes('blob/main/packages/dsh-ocgo-usage-dock/CHANGELOG.md'))
 })
 
 await test('client bundle evaluates against the loader module table', () => {

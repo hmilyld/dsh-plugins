@@ -59,6 +59,9 @@ await build({
   minify: false,
   legalComments: 'none',
   alias,
+  define: {
+    __PKG_VERSION__: JSON.stringify(pkg.version),
+  },
   external: ['react', 'react/*', 'react-dom', 'react-dom/*', '@deepseek-ai/*'],
   banner: { js: banner },
   footer: { js: footer },

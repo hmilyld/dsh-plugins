@@ -88,7 +88,37 @@ export async function apply(ctx: Context) {
 - 不要 DOM portal、不要 querySelector、不要自己做设置页跳转；用 `ctx.pluginNavigation.openBundle(PKG_NAME)`。
 - 客户端 bundle 只 external `react` / `react-dom` / `@deepseek-ai/*`。生成的 Remote 与 `zod` 要打进 bundle。
 
-## 5. 测试
+## 5. 更新检测与升级说明
+
+- **每个插件**（包括后续新增）都必须在设置页展示更新提示。统一使用 `@hmilyld/dsh-plugin-updates`：
+
+```ts
+import { createUpdateStore, UpdateNotice } from '@hmilyld/dsh-plugin-updates'
+
+const updates = createUpdateStore({
+  packageName: '@hmilyld/dsh-my-plugin',
+  currentVersion: __PKG_VERSION__, // build-client.mjs 从 package.json 注入，不要手写
+})
+void updates.refresh(false)
+```
+
+把 store 放进 slot 的 `hooks`（`hooks: { update: updates }`），组件用 `props.useUpdate((s) => s)` 读取并渲染：
+
+```tsx
+<UpdateNotice
+  state={props.useUpdate((s) => s)}
+  changelogUrl="https://github.com/hmilyld/dsh-plugins/blob/main/packages/dsh-my-plugin/CHANGELOG.md"
+  labels={{ available: '发现新版本 v{latest}（当前 v{current}）。', changelog: '查看更新说明' }}
+/>
+```
+
+- 新插件必须把 `@hmilyld/dsh-plugin-updates` 加进 `dependencies`（`workspace:^`）。
+- 更新检查在浏览器侧查询 npm registry 的 `latest`，带 6 小时缓存与静默失败；不要改为在 Host 侧轮询。
+- 所有包统一从本仓库发布到 npm。**每个用户可见改动都必须写 changeset**（`pnpm changeset`），`pnpm run version-packages` 会生成/追加各包 `CHANGELOG.md`；`CHANGELOG.md` 必须在 `files` 白名单里，随包发布。
+- 升级说明链接固定指向仓库内的 `packages/<pkg>/CHANGELOG.md`；发布前确认该版本有对应小节。
+- 现有插件：`dsh-beacon` 在设置卡片顶部展示，`dsh-ocgo-usage-dock` 在设置卡片顶部展示并在用量条的设置齿轮上点一个小绿点。
+
+## 6. 测试
 
 每个包至少覆盖：
 
@@ -102,9 +132,11 @@ export async function apply(ctx: Context) {
 
 UI 改动建议用真实 `dsh web` 做一次集成检查：插件页能看到卡片、设置能保存、dock 出现在正确 slot。
 
-## 6. 发布
+## 7. 发布
 
-- 使用 Changesets，包独立版本。
+- 使用 Changesets，包独立版本；所有包统一从本仓库发布到 npm。
+- 任何用户可见改动先 `pnpm changeset`，说明会用作用户可读的升级说明；`pnpm run version-packages` 生成各包 `CHANGELOG.md`。
+- 版本号与 changelog 由 Changesets 维护，不要手改 `version` 或直接编辑历史小节。
 - 发布前 `pnpm run check`。
 - `prepublishOnly` 跑 typecheck + test；`prepare` 供本地/源码安装构建。
 - 不改包名与 entry id；需要重命名时先提供兼容 entry 与迁移说明。

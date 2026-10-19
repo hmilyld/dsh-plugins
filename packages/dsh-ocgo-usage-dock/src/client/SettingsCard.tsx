@@ -6,7 +6,8 @@ import {
   SettingsValueField,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
-import type { SettingsFace } from './controller.ts'
+import { UpdateNotice } from '@hmilyld/dsh-plugin-updates'
+import { CHANGELOG_URL, type SettingsFace } from './controller.ts'
 import { formLabels, NS, type OcgoLocaleKey } from './locales.ts'
 
 /** Props the bundle config slot hands the card. */
@@ -32,6 +33,11 @@ export function SettingsCard(props: SettingsCardProps) {
       onSave={props.save}
       onDiscard={props.discard}
     >
+      <UpdateNotice
+        state={props.useUpdate((value) => value)}
+        changelogUrl={CHANGELOG_URL}
+        labels={{ available: t('updateAvailable'), changelog: t('updateChangelog') }}
+      />
       <SettingsValueField
         id="ocgo-api-key-env"
         label={t('apiKeyEnv')}

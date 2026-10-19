@@ -105,6 +105,7 @@ function IconButton({
  */
 export function UsageDock(props: UsageDockProps) {
   const state = props.useUsageDock((value) => value)
+  const update = props.useUpdate((value) => value)
   const t = props.t as (key: OcgoLocaleKey) => string
   const snapshot: UsageSnapshot | null = state.snapshot
 
@@ -142,9 +143,15 @@ export function UsageDock(props: UsageDockProps) {
           </IconButton>
         </>
       )}
-      <IconButton label={t('openSettings')} onClick={props.openSettings}>
-        ⚙
-      </IconButton>
+      <span style={styles.gearWrap}>
+        <IconButton
+          label={update.updateAvailable ? t('updateChangelog') : t('openSettings')}
+          onClick={props.openSettings}
+        >
+          ⚙
+        </IconButton>
+        {update.updateAvailable ? <span style={styles.updateDot} aria-hidden="true" /> : null}
+      </span>
     </div>
   )
 }
@@ -222,5 +229,19 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 14,
     lineHeight: '18px',
     borderRadius: 6,
+  },
+  gearWrap: {
+    position: 'relative',
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
+  updateDot: {
+    position: 'absolute',
+    top: -1,
+    right: -1,
+    width: 6,
+    height: 6,
+    borderRadius: '50%',
+    background: 'var(--dsw-alias-state-success-primary, #22c55e)',
   },
 }

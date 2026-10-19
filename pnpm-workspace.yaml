@@ -15,7 +15,9 @@ catalog:
   "@types/react": "^18.3.31"
   esbuild: "^0.28.2"
   react: "^18.3.1"
+  react-dom: "^18.3.1"
   typescript: "6.0.3"
+  "@types/react-dom": "^18.3.7"
 
   # DSH platform packages the plugins build against. Kept at the exact release
   # the local dsh installation ships so the compiled types match the runtime.

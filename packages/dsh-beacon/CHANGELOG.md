@@ -1,9 +1,19 @@
-# Changelog
+# @hmilyld/dsh-beacon
 
-本文件记录 dsh-beacon 的发布历史，格式参照 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
-版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+## 0.3.0
 
-## [未发布]
+### Minor Changes
+
+- 迁入 `@hmilyld/dsh-plugins` monorepo，构建、类型检查、测试与发布流程统一。
+
+  - 设置页新增 npm 更新检测：发现新版本时显示版本对比与 `CHANGELOG.md` 链接。
+  - 构建改用共享的 `tooling/build/build-client.mjs`，客户端声明类型随包发布。
+  - `engines.node` 对齐 DSH 运行时范围（`^22.19.0 || >=24.0.0`）。
+
+### Patch Changes
+
+- Updated dependencies
+  - @hmilyld/dsh-plugin-updates@0.1.0
 
 ## [0.2.2] - 2026-10-19
 
