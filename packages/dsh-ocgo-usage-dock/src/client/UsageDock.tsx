@@ -157,8 +157,10 @@ function fallback(id: string): UsageWindow {
 const styles: Record<string, CSSProperties> = {
   dock: {
     display: 'flex',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: 12,
+    rowGap: 2,
     width: '100%',
     padding: '2px 2px 4px',
     color: 'var(--dsw-alias-label-secondary, #6b7280)',
