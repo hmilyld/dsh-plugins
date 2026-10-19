@@ -114,44 +114,41 @@ export function UsageDock(props: UsageDockProps) {
 
   const failed = snapshot === null || snapshot.status === 'error' || state.transportError !== null
   return (
-    <div style={styles.dock} role="status" aria-label={t('dockLabel')}>
-      <span style={styles.brand}>{t('title')}</span>
-      {failed ? (
-        <>
+    <div style={styles.outer} role="status" aria-label={t('dockLabel')}>
+      <div style={styles.dock}>
+        <span style={styles.brand}>{t('title')}</span>
+        {failed ? (
           <span style={styles.error}>
             {state.transportError !== null
               ? t('errorNetwork')
               : errorText(snapshot?.error, t)}
           </span>
-          <span style={styles.spacer} />
-          <IconButton label={t('retry')} disabled={state.loading} onClick={props.refresh}>
-            ⟳
-          </IconButton>
-        </>
-      ) : (
-        <>
-          <WindowBar window={snapshot?.windows[0] ?? fallback('rolling')} label={t('windowRolling')} t={t} />
-          <WindowBar window={snapshot?.windows[1] ?? fallback('weekly')} label={t('windowWeekly')} t={t} />
-          <WindowBar window={snapshot?.windows[2] ?? fallback('monthly')} label={t('windowMonthly')} t={t} />
-          <span style={styles.spacer} />
+        ) : (
+          <>
+            <WindowBar window={snapshot?.windows[0] ?? fallback('rolling')} label={t('windowRolling')} t={t} />
+            <WindowBar window={snapshot?.windows[1] ?? fallback('weekly')} label={t('windowWeekly')} t={t} />
+            <WindowBar window={snapshot?.windows[2] ?? fallback('monthly')} label={t('windowMonthly')} t={t} />
+          </>
+        )}
+        <span style={styles.controls}>
           <IconButton
-            label={state.loading ? t('refreshing') : t('refresh')}
+            label={failed ? t('retry') : state.loading ? t('refreshing') : t('refresh')}
             disabled={state.loading}
             onClick={props.refresh}
           >
             ⟳
           </IconButton>
-        </>
-      )}
-      <span style={styles.gearWrap}>
-        <IconButton
-          label={update.updateAvailable ? t('updateChangelog') : t('openSettings')}
-          onClick={props.openSettings}
-        >
-          ⚙
-        </IconButton>
-        {update.updateAvailable ? <span style={styles.updateDot} aria-hidden="true" /> : null}
-      </span>
+          <span style={styles.gearWrap}>
+            <IconButton
+              label={update.updateAvailable ? t('updateChangelog') : t('openSettings')}
+              onClick={props.openSettings}
+            >
+              ⚙
+            </IconButton>
+            {update.updateAvailable ? <span style={styles.updateDot} aria-hidden="true" /> : null}
+          </span>
+        </span>
+      </div>
     </div>
   )
 }
@@ -162,14 +159,21 @@ function fallback(id: string): UsageWindow {
 }
 
 const styles: Record<string, CSSProperties> = {
+  outer: {
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100%',
+    padding: '2px 12px 4px',
+    minWidth: 0,
+  },
   dock: {
     display: 'flex',
     flexWrap: 'wrap',
+    justifyContent: 'center',
     alignItems: 'center',
     gap: 12,
     rowGap: 2,
-    width: '100%',
-    padding: '2px 2px 4px',
+    maxWidth: '100%',
     color: 'var(--dsw-alias-label-secondary, #6b7280)',
     fontSize: 12,
     lineHeight: '18px',
@@ -209,8 +213,10 @@ const styles: Record<string, CSSProperties> = {
     minWidth: 34,
     textAlign: 'right',
   },
-  spacer: {
-    flex: 1,
+  controls: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 2,
   },
   error: {
     color: 'var(--dsw-alias-state-error-primary, #ef4444)',
