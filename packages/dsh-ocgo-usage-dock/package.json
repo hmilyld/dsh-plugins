@@ -92,9 +92,9 @@
     "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2"
   },
   "dependencies": {
-    "@deepseek-ai/cosmokit": "^1.8.5",
-    "@deepseek-ai/schemastery": "^3.18.4",
-    "zod": "4.4.3"
+    "@deepseek-ai/cosmokit": "catalog:",
+    "@deepseek-ai/schemastery": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "catalog:",

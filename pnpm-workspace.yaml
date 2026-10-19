@@ -2,16 +2,19 @@ packages:
   - packages/*
   - tooling/*
 
+# esbuild's postinstall is the only build script the workspace needs; everything
+# else the plugins import is published prebuilt.
+allowBuilds:
+  esbuild: true
+
 catalog:
   # Shared build-time tooling.
   "@changesets/cli": "^3.0.3"
   "@deepseek-ai/dsh-typert-generator": "0.2.0-rc.2"
   "@types/node": "^24.19.1"
   "@types/react": "^18.3.31"
-  "@types/react-dom": "^18.3.7"
   esbuild: "^0.28.2"
   react: "^18.3.1"
-  react-dom: "^18.3.1"
   typescript: "6.0.3"
 
   # DSH platform packages the plugins build against. Kept at the exact release
@@ -32,7 +35,6 @@ catalog:
   "@deepseek-ai/dsh-credentials": "0.2.0-rc.2"
   "@deepseek-ai/dsh-llm": "0.2.0-rc.2"
   "@deepseek-ai/dsh-session": "0.2.0-rc.2"
-  "@deepseek-ai/dsh-settings": "0.2.0-rc.2"
   "@deepseek-ai/dsh-tool-ask-user": "0.2.0-rc.2"
   "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2"
   "@deepseek-ai/dsh-user-approval": "0.2.0-rc.2"
