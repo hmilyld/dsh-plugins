@@ -2,7 +2,11 @@
   "extends": "../../tsconfig.base.client.json",
   "compilerOptions": {
     "rootDir": "src/client",
-    "outDir": "lib/types/client"
+    "outDir": "lib/types/client",
+    "tsBuildInfoFile": "tsconfig.client.tsbuildinfo"
   },
-  "include": ["src/client/**/*.ts", "src/client/**/*.tsx"]
+  "include": [
+    "src/client/**/*.ts",
+    "src/client/**/*.tsx"
+  ]
 }

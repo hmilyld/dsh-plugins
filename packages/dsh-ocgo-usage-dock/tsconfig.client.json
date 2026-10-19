@@ -4,9 +4,17 @@
     "rootDir": "src/client",
     "outDir": "lib/types/client",
     "paths": {
-      "@hmilyld/dsh-ocgo-usage-dock/remote": ["./lib/typert.remote-client.d.ts"],
-      "@hmilyld/dsh-ocgo-usage-dock/types": ["./lib/types/types.d.ts"]
-    }
+      "@hmilyld/dsh-ocgo-usage-dock/remote": [
+        "./lib/typert.remote-client.d.ts"
+      ],
+      "@hmilyld/dsh-ocgo-usage-dock/types": [
+        "./lib/types/types.d.ts"
+      ]
+    },
+    "tsBuildInfoFile": "tsconfig.client.tsbuildinfo"
   },
-  "include": ["src/client/**/*.ts", "src/client/**/*.tsx"]
+  "include": [
+    "src/client/**/*.ts",
+    "src/client/**/*.tsx"
+  ]
 }
