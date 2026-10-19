@@ -42,7 +42,6 @@
     "build": "node ../../tooling/build/build-package.mjs .",
     "typecheck": "tsc -b tsconfig.json tsconfig.client.json",
     "test": "pnpm run build && pnpm -w exec vitest run packages/dsh-beacon && node tests/legacy-smoke.mjs",
-    "send-test": "pnpm run build && node examples/send-test.mjs",
     "prepublishOnly": "pnpm run build && pnpm run test"
   },
   "keywords": [

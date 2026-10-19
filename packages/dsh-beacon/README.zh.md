@@ -60,7 +60,7 @@ dsh plugin --profile <name> add /absolute/path/to/DSHPlugins/packages/dsh-beacon
 
 ## 更新检测
 
-插件设置页通过 `@hmilyld/dsh-plugin-updates` 查询 npm 上本包的 `latest` 版本（6 小时缓存，失败静默）。发现新版本时，页面顶部显示版本对比和 **查看更新说明** 链接；说明来自本包的 [`CHANGELOG.md`](./CHANGELOG.md)，每次发布由 Changesets 生成。
+插件设置页通过 `@hmilyld/dsh-plugin-kit` 查询 npm 上本包的 `latest` 版本（6 小时缓存，失败静默）。发现新版本时，页面顶部显示版本对比和 **查看更新说明** 链接；说明来自本包的 [`CHANGELOG.md`](./CHANGELOG.md)，每次发布由 Changesets 生成。
 
 ## 配置
 

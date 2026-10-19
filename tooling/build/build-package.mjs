@@ -30,6 +30,8 @@ const hasTypert =
   typeof pkg.exports === 'object' &&
   pkg.exports !== null &&
   ('./typert' in pkg.exports || './remote' in pkg.exports)
+const hasRemote =
+  typeof pkg.exports === 'object' && pkg.exports !== null && './remote' in pkg.exports
 
 /** Run one tool in the package directory. */
 function run(command, args, face) {
@@ -49,7 +51,7 @@ run(process.execPath, [tsdown], 'host')
 if (hasTypert && !existsSync(join(packageDir, 'lib', 'typert.host.js'))) {
   throw new Error(`${pkg.name}: build produced no lib/typert.host.js`)
 }
-if (hasTypert && !existsSync(join(packageDir, 'lib', 'typert.remote-client.js'))) {
+if (hasRemote && !existsSync(join(packageDir, 'lib', 'typert.remote-client.js'))) {
   throw new Error(`${pkg.name}: build produced no lib/typert.remote-client.js`)
 }
 if (!existsSync(join(packageDir, 'lib', 'index.js'))) {

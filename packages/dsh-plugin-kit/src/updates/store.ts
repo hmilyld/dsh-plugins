@@ -6,7 +6,7 @@ import type { UpdateStatus, UpdateStore } from './types.ts'
 const DEFAULT_INTERVAL_MS = 6 * 60 * 60 * 1000
 
 /** Per-package cache namespace, versioned so a shape change cannot be misread. */
-const CACHE_PREFIX = 'dsh-plugin-updates:v1:'
+const CACHE_PREFIX = 'dsh-plugin-kit:updates:v1:'
 
 /** One cached registry answer. */
 interface CacheRecord {
@@ -52,11 +52,13 @@ export function createUpdateStore(options: UpdateStoreOptions): UpdateStore {
   let inflight: Promise<void> | undefined
 
   const cached = readRecord()
-  if (cached !== null) {
+  if (cached !== null && now() - cached.checkedAt <= intervalMs) {
+    const latestVersion = cached.latestVersion === '' ? null : cached.latestVersion
     state = {
       ...state,
-      latestVersion: cached.latestVersion,
-      updateAvailable: isNewerVersion(cached.latestVersion, options.currentVersion),
+      latestVersion,
+      updateAvailable:
+        latestVersion !== null && isNewerVersion(latestVersion, options.currentVersion),
       checkedAt: cached.checkedAt,
     }
   }

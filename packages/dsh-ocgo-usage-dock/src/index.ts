@@ -10,9 +10,7 @@
  * loader discovers `lib/typert.host.js` from the package export and binds the
  * generated reflection to this same key.
  */
-import type { Context, Volatile } from '@deepseek-ai/cordis'
-import { isVolatile } from '@deepseek-ai/cosmokit'
-import type CredentialProvider from '@deepseek-ai/dsh-credentials'
+import type { Context } from '@deepseek-ai/cordis'
 import { Remote, TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { Config } from './config.ts'
 import type { UsageSnapshot } from './types.ts'
@@ -39,11 +37,6 @@ interface CacheEntry {
   baseUrl: string
   fetchedAt: number
   snapshot: UsageSnapshot
-}
-
-/** Read a live-wrapped configuration value. */
-function read<T>(value: Volatile<T> | T): T {
-  return isVolatile(value) ? ((value as Volatile<T>).get() as T) : (value as T)
 }
 
 /** Host-side Remote controller for the OpenCode Go usage dock. */
@@ -73,7 +66,7 @@ export default class OcgoUsageController extends TypertRemoteService {
   @Remote
   async snapshot(force: boolean): Promise<UsageSnapshot> {
     const config = readConfig(this.config)
-    const credentials = this.ctx.get('credentials') as CredentialProvider | undefined
+    const credentials = this.ctx.get('credentials')
     const key = await resolveApiKey(config, credentials)
     if (key === undefined) return emptySnapshot(config, 'no-key')
 
@@ -124,10 +117,5 @@ export default class OcgoUsageController extends TypertRemoteService {
       snapshot,
     }
     return snapshot
-  }
-
-  /** Read the deprecated literal without retaining its value. */
-  get legacyApiKey(): boolean {
-    return read(this.config.apiKey).trim().length > 0
   }
 }

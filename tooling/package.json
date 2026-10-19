@@ -1,7 +1,0 @@
-{
-  "name": "@hmilyld/dsh-tooling",
-  "private": true,
-  "type": "module",
-  "version": "0.0.0",
-  "description": "Shared build tooling for the dsh-plugins monorepo"
-}

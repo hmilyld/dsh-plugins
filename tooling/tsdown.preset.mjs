@@ -54,10 +54,13 @@ function clientExternals(pkg) {
     ...(pkg.dsh?.client?.external ?? []),
     ...REACT_BASELINE,
   ])
-  return (id) =>
-    requested.has(id) ||
-    id.startsWith('react/') ||
-    id.startsWith('react-dom/')
+  return (id) => {
+    if (id.startsWith('react/') || id.startsWith('react-dom/')) return true
+    for (const name of requested) {
+      if (id === name || id.startsWith(`${name}/`)) return true
+    }
+    return false
+  }
 }
 
 /** Changelog URL derived from the repository manifest, when it is a GitHub repo. */
@@ -94,6 +97,7 @@ export function pluginConfig(packageDir, face = 'host') {
       deps: {
         neverBundle: external,
         alwaysBundle: (id) => !external(id),
+        onlyBundle: false,
       },
       define,
       outputOptions: {

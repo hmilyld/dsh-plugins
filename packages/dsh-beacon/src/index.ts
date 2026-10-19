@@ -320,6 +320,12 @@ export function apply(ctx: Context, config: Config): void {
     for (const [k, t] of recent) {
       if (now - t >= read(config.dedupWindowMs)) recent.delete(k)
     }
+    // A very large window can keep every entry fresh; keep the map hard-bounded.
+    while (recent.size > 1024) {
+      const oldest = recent.keys().next().value
+      if (oldest === undefined) break
+      recent.delete(oldest)
+    }
   }
 
   /**

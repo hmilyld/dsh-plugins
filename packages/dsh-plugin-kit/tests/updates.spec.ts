@@ -135,7 +135,7 @@ describe('update store', () => {
   it('seeds the store from a cached answer before any request', () => {
     const storage = memoryStorage()
     storage.setItem(
-      'dsh-plugin-updates:v1:@hmilyld/dsh-ocgo-usage-dock',
+      'dsh-plugin-kit:updates:v1:@hmilyld/dsh-ocgo-usage-dock',
       JSON.stringify({ latestVersion: '0.4.0', checkedAt: Date.now() }),
     )
     const updates = createUpdateStore({
