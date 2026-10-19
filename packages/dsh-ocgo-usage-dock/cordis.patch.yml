@@ -1,0 +1,18 @@
+# dsh-ocgo-usage-dock bundle 层：`dsh plugin --profile web add 本包` 时把插件行
+# 插入 profile 组合（package.json 的 dsh.bundle.patch 指向本文件）。
+#
+# 三处 id 一致性铁律（改任何一处都要同步其余两处，否则 loading 循环）：
+#   1. 本文件的 id（也是设置分区命名空间 NS）
+#   2. lib/index.js 导出的 name
+#   3. README 示例里的 id
+#
+# apiKey 默认留空，插件静默停用（Client 半边不渲染任何内容）；填好保存后
+# 立即生效，无需重启 dsh web。
+- insert:
+    - id: ocgo-usage-dock
+      name: '@hmilyld/dsh-ocgo-usage-dock'
+      config:
+        apiKey: ''
+        refreshIntervalMs: 300000
+        timeoutMs: 15000
+        baseUrl: 'https://opencode.ai/zen/go/v1/usage'
