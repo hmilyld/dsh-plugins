@@ -88,7 +88,7 @@ DSH_BUILD_FACE=client tsdown         → lib/client.js
 
 ### 3.4 Typert 偏差
 
-协议来自 npm，不在 workspace 内。Kit 提供 `typert-protocol.d.ts` ambient shim；插件 `tsconfig.json` 用 `paths` 指向它。构建仍使用官方 `typertPlugin`（package 模式），产物 import 真实协议包。
+协议来自 npm，不在 workspace 内。Kit 提供规范的 `typert-protocol.d.ts` ambient shim；Typert 插件把它**复制到自己的 `src/typert-protocol.d.ts`**，并用 `tsconfig.json` 的 `paths` 指向本包副本（生成器按包根解析，直接引用 Kit 路径会失效）。构建仍使用官方 `typertPlugin`（package 模式），产物 import 真实协议包。
 
 ## 4. package.json
 

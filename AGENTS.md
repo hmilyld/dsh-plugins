@@ -45,7 +45,7 @@ pnpm --filter @hmilyld/dsh-ocgo-usage-dock run test
 
 ## 常见的坑
 
-- Typert 生成器只认工作区内的 `@deepseek-ai/dsh-typert-protocol` 声明。Kit 提供 `src/typert-protocol.d.ts` ambient shim；插件 `tsconfig.json` 用 `paths` 指过去。
+- Typert 生成器只认工作区内的 `@deepseek-ai/dsh-typert-protocol` 声明。Kit 提供规范的 `src/typert-protocol.d.ts` ambient shim；Typert 插件复制到自己的 `src/`，并让 `tsconfig.json` 的 `paths` 指向本包副本（直接引用 Kit 路径生成器识别不到）。
 - 官方 `dsh-client-ui-slots` 的 d.ts 引用 `dsh-client-store`，但后者不在其依赖里；客户端包必须自己把 `@deepseek-ai/dsh-client-store` 放进 devDependencies。
 - Schemastery 的 `Config` 不要写 `: Schema<Config>` 显式注解。
 - `tsc -b` 在删除 `lib/` 后仍可能认为输出是最新的；`build-package.mjs` 使用 `--force`。
