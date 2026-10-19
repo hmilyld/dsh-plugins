@@ -55,7 +55,7 @@ export function BeaconCard(props: BeaconCardProps) {
         hint={t('webhookUrlHint')}
         overriddenLabel={t('overridden')}
         resetLabel={t('reset')}
-        invalidLabel={t('invalidNumber')}
+        invalidLabel={t('invalidValue')}
         disabled={disabled}
         {...state.webhookUrl}
         onEdit={edit('webhookUrl')}

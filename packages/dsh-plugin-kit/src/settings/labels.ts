@@ -10,6 +10,7 @@ export type CommonLocaleKey =
   | 'unavailable'
   | 'overridden'
   | 'reset'
+  | 'invalidValue'
   | 'updateAvailable'
   | 'updateChangelog'
 

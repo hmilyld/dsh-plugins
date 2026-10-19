@@ -48,7 +48,7 @@ export function SettingsCard(props: SettingsCardProps) {
         invalid={state.apiKeyEnv.invalid}
         overriddenLabel={t('overridden')}
         resetLabel={t('reset')}
-        invalidLabel={t('invalidNumber')}
+        invalidLabel={t('invalidValue')}
         disabled={disabled}
         onEdit={(text) => props.edit('apiKeyEnv', text)}
         onReset={() => props.resetField('apiKeyEnv')}
@@ -66,9 +66,10 @@ export function SettingsCard(props: SettingsCardProps) {
         legacy={{
           visible: state.legacyApiKey,
           message: t('legacyNotice'),
-          actionLabel: t('clearLegacy'),
+          actionLabel: state.legacyClearBusy ? t('clearingLegacy') : t('clearLegacy'),
           onClear: props.clearLegacyKey,
-          disabled,
+          disabled: disabled || state.legacyClearBusy,
+          ...(state.legacyClearFailed ? { failed: t('legacyClearFailed') } : {}),
         }}
       />
       <SettingsValueField
@@ -110,7 +111,7 @@ export function SettingsCard(props: SettingsCardProps) {
         invalid={state.baseUrl.invalid}
         overriddenLabel={t('overridden')}
         resetLabel={t('reset')}
-        invalidLabel={t('invalidNumber')}
+        invalidLabel={t('invalidValue')}
         disabled={disabled}
         onEdit={(text) => props.edit('baseUrl', text)}
         onReset={() => props.resetField('baseUrl')}

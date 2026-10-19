@@ -20,10 +20,13 @@ export interface UsageWindow {
   resetInSec?: number
 }
 
+/** Host answer state. */
+export type UsageStatus = 'ok' | 'no-key' | 'error'
+
 /** Complete answer of one usage read. */
 export interface UsageSnapshot {
   /** `ok`, `no-key`, or `error`. */
-  status: string
+  status: UsageStatus
   /** Human-readable failure code when `status` is `error`. */
   error?: string
   /** ISO-8601 time at which the Host produced this answer. */

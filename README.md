@@ -76,7 +76,7 @@ pnpm run check
 # 推送后由 .github/workflows/release.yml 统一发布
 ```
 
-发布走 npm Trusted Publishing（OIDC），workflow 不设置 `NODE_AUTH_TOKEN` / `registry-url`。首次发布需在 npm 包设置里绑定 `hmilyld/dsh-plugins` 与 `release.yml`。
+发布走 npm Trusted Publishing（OIDC），workflow 不设置 `NODE_AUTH_TOKEN` / `registry-url`。首次发布需在 npm 包设置里绑定 `hmilyld/dsh-plugins` 与 `release.yml`。发布测试清单见 [`docs/release-testing.md`](./docs/release-testing.md)。
 
 ## License
 

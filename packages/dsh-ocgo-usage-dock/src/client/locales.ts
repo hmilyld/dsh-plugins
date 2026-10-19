@@ -32,6 +32,7 @@ export type OcgoLocaleKey =
   | 'legacyNotice'
   | 'clearLegacy'
   | 'clearingLegacy'
+  | 'legacyClearFailed'
   | 'apiKeyEnv'
   | 'apiKeyEnvHint'
   | 'apiKey'
@@ -54,6 +55,7 @@ export type OcgoLocaleKey =
   | 'saving'
   | 'saveFailed'
   | 'invalidNumber'
+  | 'invalidValue'
   | 'updateAvailable'
   | 'updateChangelog'
 
@@ -82,6 +84,7 @@ export const en: Record<OcgoLocaleKey, string> = {
     'This profile still uses the deprecated apiKey setting. Clear it after storing the key below so the credential reference takes effect.',
   clearLegacy: 'Clear deprecated key',
   clearingLegacy: 'Clearing…',
+  legacyClearFailed: 'Could not clear the deprecated key. Try again.',
   apiKeyEnv: 'Credential reference',
   apiKeyEnvHint:
     'Name of the environment variable that holds the key, for example OPENCODE_GO_API_KEY. The key is resolved by the Host on each request.',
@@ -105,6 +108,7 @@ export const en: Record<OcgoLocaleKey, string> = {
   saving: 'Saving…',
   saveFailed: 'The deployment did not accept these values; they were left for you to correct.',
   invalidNumber: 'Enter a number, or leave blank to use the default.',
+  invalidValue: 'Enter a value.',
   updateAvailable: 'A newer release v{latest} is available (running v{current}).',
   updateChangelog: 'View release notes',
 }
@@ -134,6 +138,7 @@ export const zh: Record<OcgoLocaleKey, string> = {
     '当前配置仍在使用已弃用的 apiKey 字段。请在下方保存密钥后清除旧字段，凭证引用才会生效。',
   clearLegacy: '清除旧版密钥',
   clearingLegacy: '清除中…',
+  legacyClearFailed: '清除旧版密钥失败，请重试。',
   apiKeyEnv: '凭证引用',
   apiKeyEnvHint:
     '保存密钥的环境变量名，例如 OPENCODE_GO_API_KEY。Host 会在每次请求时重新解析。',
@@ -157,6 +162,7 @@ export const zh: Record<OcgoLocaleKey, string> = {
   saving: '保存中…',
   saveFailed: '本部署没有接受这些值，已保留供你修改。',
   invalidNumber: '请填数字；留空表示使用默认值。',
+  invalidValue: '请填写一个值。',
   updateAvailable: '发现新版本 v{latest}（当前 v{current}）。',
   updateChangelog: '查看更新说明',
 }

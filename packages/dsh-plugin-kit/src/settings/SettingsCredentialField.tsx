@@ -14,6 +14,8 @@ export interface LegacyCredentialNotice {
   onClear: () => void
   /** Disables the clear action. */
   disabled?: boolean
+  /** Failure copy shown under the notice. */
+  failed?: string
 }
 
 /** Props for {@link SettingsCredentialField}. */
@@ -68,6 +70,11 @@ export function SettingsCredentialField(props: SettingsCredentialFieldProps) {
           >
             {legacy.actionLabel}
           </button>
+          {legacy.failed !== undefined ? (
+            <span style={styles.error} role="alert">
+              {legacy.failed}
+            </span>
+          ) : null}
         </div>
       ) : null}
     </>
@@ -85,6 +92,12 @@ const styles: Record<string, CSSProperties> = {
     border: '1px solid var(--dsw-alias-state-warning-border, #f59e0b)',
     background: 'var(--dsw-alias-state-warning-bg, rgba(245, 158, 11, 0.08))',
     color: 'var(--dsw-alias-label-secondary, #6b7280)',
+    fontSize: 12,
+    lineHeight: '18px',
+  },
+  error: {
+    flexBasis: '100%',
+    color: 'var(--dsw-alias-state-error-primary, #ef4444)',
     fontSize: 12,
     lineHeight: '18px',
   },

@@ -184,8 +184,11 @@ async function fetchLatest(
 
 /** The browser storage to persist answers in, when one exists. */
 function defaultStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
+  // The update store is browser-only; avoiding `localStorage` outside a window
+  // also keeps Node's experimental localStorage from warning during tests.
+  if (typeof window === 'undefined') return null
   try {
-    return typeof localStorage === 'undefined' ? null : localStorage
+    return localStorage
   } catch {
     return null
   }

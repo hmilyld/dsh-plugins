@@ -19,7 +19,7 @@ import {
   MIN_REFRESH_INTERVAL_MS,
   MIN_TIMEOUT_MS,
 } from './constants.ts'
-import type { UsageSnapshot, UsageWindow } from './types.ts'
+import type { UsageSnapshot, UsageStatus, UsageWindow } from './types.ts'
 
 /** Environment names consulted after `apiKeyEnv` for old deployments. */
 export const FALLBACK_ENV_KEYS = ['OPENCODE_GO_API_KEY', 'OPENCODE_API_KEY'] as const
@@ -172,7 +172,7 @@ export function normalizeUsageShape(data: unknown): UsageWindow[] {
 }
 
 /** Snapshot used when no key can be resolved. */
-export function emptySnapshot(config: ResolvedConfig, status: string, error?: string): UsageSnapshot {
+export function emptySnapshot(config: ResolvedConfig, status: UsageStatus, error?: string): UsageSnapshot {
   const snapshot: UsageSnapshot = {
     status,
     updatedAt: new Date().toISOString(),

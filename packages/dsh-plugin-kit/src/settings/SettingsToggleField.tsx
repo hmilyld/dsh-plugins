@@ -37,9 +37,16 @@ export function SettingsToggleField(props: SettingsToggleFieldProps) {
   return (
     <div style={{ ...styles.field, ...(props.spaced === true ? styles.divider : null) }}>
       <div style={styles.head}>
-        <span id={props.id} style={styles.label}>
+        <button
+          type="button"
+          id={props.id}
+          style={{ ...styles.label, ...styles.labelButton }}
+          onClick={() => props.onToggle(!props.checked)}
+          disabled={props.disabled}
+          aria-pressed={props.checked}
+        >
           {props.label}
-        </span>
+        </button>
         <div style={styles.badges}>
           {props.overridden ? <span style={styles.badge}>{props.overriddenLabel}</span> : null}
           <button
@@ -74,6 +81,16 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     lineHeight: 1.5,
     color: 'var(--dsw-alias-label-primary)',
+  },
+  labelButton: {
+    border: 'none',
+    background: 'none',
+    padding: 0,
+    textAlign: 'left',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    fontSize: 13,
+    fontWeight: 500,
   },
   badges: { display: 'inline-flex', alignItems: 'center', gap: 8 },
   badge: {

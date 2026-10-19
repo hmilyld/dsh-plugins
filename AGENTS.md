@@ -1,6 +1,6 @@
 # AGENTS.md
 
-本仓库是 hmilyld 的 DSH 插件 monorepo。改动前先读 [`docs/plugin-standard.md`](./docs/plugin-standard.md) 与 [`docs/known-deviations.md`](./docs/known-deviations.md)。
+本仓库是 hmilyld 的 DSH 插件 monorepo。改动前先读 [`docs/plugin-standard.md`](./docs/plugin-standard.md) 与 [`docs/known-deviations.md`](./docs/known-deviations.md)；发布测试清单见 [`docs/release-testing.md`](./docs/release-testing.md)。
 
 ## 命令
 

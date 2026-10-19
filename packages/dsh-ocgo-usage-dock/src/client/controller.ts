@@ -78,6 +78,8 @@ export interface SettingsState extends SettingsFormShell {
   credentialConfigured: boolean
   credentialWritable: boolean
   legacyApiKey: boolean
+  legacyClearBusy: boolean
+  legacyClearFailed: boolean
 }
 
 /** The dock slot's injected face. */
@@ -142,6 +144,7 @@ export class OcgoClientController {
   private timer: ReturnType<typeof setTimeout> | undefined
   private inflight: Promise<void> | undefined
   private inflightForce = false
+  private legacyClear: 'idle' | 'clearing' | 'failed' = 'idle'
   private disposed = false
 
   /**
@@ -201,12 +204,7 @@ export class OcgoClientController {
       save: actions.save,
       discard: actions.discard,
       clearLegacyKey: () => {
-        // A role('secret') field is absent from the settings `user` layer, so
-        // the staged form's resetField would see `stored === false` and emit no
-        // unset op. Mutate the document directly instead.
-        const snapshot = this.scope.getSnapshot()
-        if (!snapshot.writable) return
-        void this.scope.mutate([{ op: 'unset', path: ['apiKey'] }], snapshot.revision)
+        this.clearLegacyKey()
       },
     }
   }
@@ -231,6 +229,8 @@ export class OcgoClientController {
       credentialConfigured: this.credential.configured,
       credentialWritable: this.credential.writable,
       legacyApiKey: this.dockStore.getSnapshot().snapshot?.legacyApiKey ?? false,
+      legacyClearBusy: this.legacyClear === 'clearing',
+      legacyClearFailed: this.legacyClear === 'failed',
     }
   }
 
@@ -242,6 +242,32 @@ export class OcgoClientController {
       void this.readCredential()
     }
     this.settingsStore.set(this.projection())
+  }
+
+  /**
+   * Clear the deprecated literal through the settings mutation.
+   *
+   * A `role('secret')` field is absent from the settings `user` layer, so the
+   * staged form's `resetField` sees `stored === false` and emits no unset op.
+   */
+  private clearLegacyKey(): void {
+    if (this.legacyClear === 'clearing') return
+    const snapshot = this.scope.getSnapshot()
+    if (!snapshot.writable) return
+    this.legacyClear = 'clearing'
+    this.publish()
+    void this.scope
+      .mutate([{ op: 'unset', path: ['apiKey'] }], snapshot.revision)
+      .then(
+        (ok) => {
+          this.legacyClear = ok ? 'idle' : 'failed'
+          this.publish()
+        },
+        () => {
+          this.legacyClear = 'failed'
+          this.publish()
+        },
+      )
   }
 
   /** The reference the form currently names, falling back to the provider default. */
