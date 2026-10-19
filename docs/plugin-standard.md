@@ -117,6 +117,7 @@ DSH_BUILD_FACE=client tsdown         → lib/client.js
   - 网络失败折叠为值，不 throw。
   - 缓存 TTL 读当前配置；并发 single-flight；**强制刷新不得被在途请求吞掉**。
 - 密钥顺序：旧 `apiKey` → `process.env[apiKeyEnv]` → 历史 env 名 → `ctx.credentials.resolve`。secret 永不进 settings。
+- `role('secret')` 字段不出现在 settings 的 `user` 层，`resetField` 因 `stored === false` 不会产生 unset；清除旧 `apiKey` 必须直接 `scope.mutate([{ op: 'unset', path: ['apiKey'] }], revision)`。
 - 网络：除更新检测外，所有外部请求走 Host；必须有超时；失败只记日志。
 - 日志：`ctx.logger(<entry-id>)`；禁止 `inject: ['logger']`；禁止打印 secret/Authorization/完整 payload。
 - 生命周期：定时器 `ctx.effect` 清理；Map/Set 有硬上限。

@@ -153,8 +153,6 @@ export class OcgoClientController {
       this.scope,
       [
         settingsTextField('apiKeyEnv'),
-        // Kept only so the migration notice can stage a clear; never rendered.
-        settingsTextField('apiKey'),
         secondsField('refreshIntervalMs', MIN_REFRESH_INTERVAL_MS / 1000),
         secondsField('timeoutMs', MIN_TIMEOUT_MS / 1000),
         settingsTextField('baseUrl'),
@@ -203,8 +201,12 @@ export class OcgoClientController {
       save: actions.save,
       discard: actions.discard,
       clearLegacyKey: () => {
-        this.form.actions().resetField('apiKey')
-        this.form.actions().save()
+        // A role('secret') field is absent from the settings `user` layer, so
+        // the staged form's resetField would see `stored === false` and emit no
+        // unset op. Mutate the document directly instead.
+        const snapshot = this.scope.getSnapshot()
+        if (!snapshot.writable) return
+        void this.scope.mutate([{ op: 'unset', path: ['apiKey'] }], snapshot.revision)
       },
     }
   }
