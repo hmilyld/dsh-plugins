@@ -4,10 +4,10 @@
   "description": "DSH (DeepSeek Harness) webhook beacon: POST a JSON payload with variable substitution when a task completes or the agent needs user questions, plan confirmation, or approval.",
   "type": "module",
   "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "types": "lib/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./lib/index.d.ts",
+      "types": "./lib/types/index.d.ts",
       "default": "./lib/index.js"
     },
     "./client": {
@@ -18,8 +18,11 @@
   },
   "files": [
     "CHANGELOG.md",
-    "lib",
-    "cordis.patch.yml"
+    "cordis.patch.yml",
+    "lib/index.js",
+    "lib/client.js",
+    "lib/types/**/*.d.ts",
+    "examples"
   ],
   "dsh": {
     "bundle": {
@@ -27,19 +30,20 @@
     },
     "client": {
       "inject": [
-        "@deepseek-ai/dsh-client-ui-settings",
-        "@deepseek-ai/dsh-client-ui-plugin-manager"
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-plugin-manager",
+        "@deepseek-ai/dsh-client-ui-primitives",
+        "@deepseek-ai/dsh-client-ui-settings"
       ],
       "platform": "web"
     }
   },
   "scripts": {
-    "build": "tsc -b tsconfig.json && tsc -b tsconfig.client.json && node ../../tooling/build/build-client.mjs .",
+    "build": "node ../../tooling/build/build-package.mjs .",
     "typecheck": "tsc -b tsconfig.json tsconfig.client.json",
-    "test": "pnpm run build && node scripts/smoke-test.mjs",
-    "send-test": "pnpm run build && node scripts/send-test.mjs",
-    "prepublishOnly": "pnpm run typecheck && pnpm run test",
-    "prepare": "pnpm run build"
+    "test": "pnpm run build && pnpm -w exec vitest run packages/dsh-beacon && node tests/legacy-smoke.mjs",
+    "send-test": "pnpm run build && node examples/send-test.mjs",
+    "prepublishOnly": "pnpm run build && pnpm run test"
   },
   "keywords": [
     "dsh",
@@ -75,8 +79,7 @@
   },
   "dependencies": {
     "@deepseek-ai/cosmokit": "catalog:",
-    "@deepseek-ai/schemastery": "catalog:",
-    "@hmilyld/dsh-plugin-updates": "workspace:^"
+    "@deepseek-ai/schemastery": "catalog:"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "catalog:",
@@ -93,6 +96,12 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "react": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@hmilyld/dsh-plugin-kit": "workspace:*",
+    "vitest": "catalog:",
+    "@deepseek-ai/dsh-client-locale": "catalog:",
+    "@deepseek-ai/dsh-client-store": "catalog:",
+    "@deepseek-ai/dsh-client-ui-renderer": "catalog:",
+    "@deepseek-ai/dsh-api-remotes": "catalog:"
   }
 }

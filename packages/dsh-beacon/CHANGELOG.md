@@ -4,16 +4,13 @@
 
 ### Minor Changes
 
-- 迁入 `@hmilyld/dsh-plugins` monorepo，构建、类型检查、测试与发布流程统一。
-
-  - 设置页新增 npm 更新检测：发现新版本时显示版本对比与 `CHANGELOG.md` 链接。
-  - 构建改用共享的 `tooling/build/build-client.mjs`，客户端声明类型随包发布。
-  - `engines.node` 对齐 DSH 运行时范围（`^22.19.0 || >=24.0.0`）。
-
-### Patch Changes
-
-- Updated dependencies
-  - @hmilyld/dsh-plugin-updates@0.1.0
+- 统一到 DSH 插件工程标准 v1。
+  
+  - 构建改为官方两段式：`tsc` → `tsdown` host → `tsc` → `tsdown` client，产物为 `lib/index.js` / `lib/client.js` / `lib/types/**`。
+  - 客户端拆分为 controller / settings / locales，接入私有 `@hmilyld/dsh-plugin-kit` 的统一设置外壳、字段与更新提示。
+  - 新增 zh/en 双语文案；设置页改用官方 `SettingsForm` 组合，移除手写 field 与内联样式。
+  - 新增 npm 更新检测与 `CHANGELOG.md` 链接。
+  - 测试迁移到 `tests/` + vitest，保留原有行为回归脚本。
 
 ## [0.2.2] - 2026-10-19
 

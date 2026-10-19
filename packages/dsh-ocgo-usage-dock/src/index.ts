@@ -56,7 +56,7 @@ export default class OcgoUsageController extends TypertRemoteService {
 
   private readonly config: Config
   private cache: CacheEntry | undefined
-  private inflight: Promise<UsageSnapshot> | undefined
+  private inflight: { promise: Promise<UsageSnapshot>; force: boolean } | undefined
 
   constructor(ctx: Context, config: Config) {
     super(ctx, 'ocgoUsage', { namespace: 'ocgoUsage' })
@@ -87,16 +87,26 @@ export default class OcgoUsageController extends TypertRemoteService {
       Date.now() - cached.fetchedAt < config.refreshIntervalMs
     if (!force && fresh) return cached.snapshot
 
-    // A manual refresh may join an in-flight request; it never starts a second
-    // one, so two clicks cannot double-charge the upstream endpoint.
-    if (this.inflight !== undefined) return this.inflight
+    // A non-forced read joins the request in flight. A forced read waits for it
+    // and then starts a fresh one, so a key saved during a poll is not masked by
+    // the poll's old configuration.
+    if (this.inflight !== undefined) {
+      if (!force) return this.inflight.promise
+      // A forced call that finds a forced request in flight shares it. A forced
+      // call that finds a normal poll waits for it, then starts a fresh one so
+      // a key saved mid-poll is not masked by the poll's old configuration.
+      if (this.inflight.force) return this.inflight.promise
+      await this.inflight.promise
+      if (this.inflight !== undefined) return this.inflight.promise
+    }
 
     const run = this.load(config, key, fingerprint)
-    this.inflight = run
+    const entry = { promise: run, force }
+    this.inflight = entry
     try {
       return await run
     } finally {
-      this.inflight = undefined
+      if (this.inflight === entry) this.inflight = undefined
     }
   }
 

@@ -5,7 +5,11 @@
   },
   "files": [],
   "references": [
-    { "path": "./packages/dsh-beacon" },
-    { "path": "./packages/dsh-ocgo-usage-dock" }
+    {
+      "path": "./packages/dsh-beacon"
+    },
+    {
+      "path": "./packages/dsh-ocgo-usage-dock"
+    }
   ]
 }

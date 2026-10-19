@@ -3,12 +3,12 @@
   "version": "0.3.0",
   "description": "DSH (DeepSeek Harness) web dock showing OpenCode Go rolling, weekly, and monthly usage, with a credential-backed settings page.",
   "type": "module",
-  "main": "lib/types/index.js",
+  "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./lib/types/index.d.ts",
-      "default": "./lib/types/index.js"
+      "default": "./lib/index.js"
     },
     "./types": {
       "types": "./lib/types/types.d.ts",
@@ -31,6 +31,7 @@
   "files": [
     "CHANGELOG.md",
     "cordis.patch.yml",
+    "lib/index.js",
     "lib/client.js",
     "lib/typert.host.js",
     "lib/typert.host.d.ts",
@@ -56,11 +57,10 @@
     }
   },
   "scripts": {
-    "build": "tsc -b tsconfig.json && node ../../tooling/build/generate-typert.mjs ../.. @hmilyld/dsh-ocgo-usage-dock && tsc -b tsconfig.client.json && node ../../tooling/build/build-client.mjs .",
+    "build": "node ../../tooling/build/build-package.mjs .",
     "typecheck": "tsc -b tsconfig.json tsconfig.client.json",
-    "test": "pnpm run build && node test/smoke.mjs",
-    "prepublishOnly": "pnpm run typecheck && pnpm run test",
-    "prepare": "pnpm run build"
+    "test": "pnpm run build && pnpm -w exec vitest run packages/dsh-ocgo-usage-dock",
+    "prepublishOnly": "pnpm run build && pnpm run test"
   },
   "keywords": [
     "dsh",
@@ -95,7 +95,6 @@
   "dependencies": {
     "@deepseek-ai/cosmokit": "catalog:",
     "@deepseek-ai/schemastery": "catalog:",
-    "@hmilyld/dsh-plugin-updates": "workspace:^",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -114,6 +113,8 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "react": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@hmilyld/dsh-plugin-kit": "workspace:*",
+    "vitest": "catalog:"
   }
 }

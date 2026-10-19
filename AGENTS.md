@@ -1,15 +1,17 @@
 # AGENTS.md
 
-本仓库是 hmilyld 的 DSH 插件 monorepo。改动前先读 `docs/plugin-standard.md`。
+本仓库是 hmilyld 的 DSH 插件 monorepo。改动前先读 [`docs/plugin-standard.md`](./docs/plugin-standard.md) 与 [`docs/known-deviations.md`](./docs/known-deviations.md)。
 
 ## 命令
 
 ```bash
 pnpm install
 pnpm run build
-pnpm run typecheck   # 需要先 build（客户端类型依赖生成的 ./remote）
+pnpm run typecheck   # 需要先 build
+pnpm run lint
 pnpm run test
-pnpm run check       # build + test
+pnpm run check       # build + lint + test
+pnpm run pack:check  # publint
 ```
 
 单包：
@@ -21,29 +23,32 @@ pnpm --filter @hmilyld/dsh-ocgo-usage-dock run test
 
 ## 结构
 
-- `packages/dsh-beacon`：无 Typert Remote 的简单 Host + Client 插件参考。
-- `packages/dsh-ocgo-usage-dock`：Typert Remote + credentials + 两个 slot 的完整参考。
-- `packages/dsh-plugin-updates`：所有插件共用的 npm 更新检测（`createUpdateStore` + `UpdateNotice`）。
-- `tooling/build/build-client.mjs`：共享 esbuild 客户端打包器（ModuleLoader 包装）。
-- `tooling/build/generate-typert.mjs`：调用官方 Typert 生成器，输出 `lib/typert.*`。
-- `tsconfig.host.json` / `tsconfig.client.json`：根聚合，生成器靠它们发现 `packages/*`。
+- `packages/dsh-beacon`：事件监听 + webhook 插件。
+- `packages/dsh-ocgo-usage-dock`：Typert Remote + credentials + dock 的完整参考。
+- `packages/dsh-plugin-kit`：private 设置/更新 Kit，打包进插件，不发 npm。
+- `tooling/tsdown.preset.mjs`：共享 tsdown 配置（host ESM / client CJS ModuleLoader）。
+- `tooling/build/build-package.mjs`：单包两段式构建（tsc → tsdown host → tsc → tsdown client）。
+- `tooling/scaffold`：`pnpm gen:plugin` 模板。
 
 ## 不能破坏的约束
 
 - 不改已发布包名与 `cordis.patch.yml` 的 `id`；设置命名空间等于 entry id。
-- 不把 `lib/` 提交进 git；发布由 `files` 白名单带构建产物。
-- 不手写 Typert wire descriptor；用 `@Remote` 生成。
-- 不在客户端直接读写 settings 文档；用 `SettingsFormModel` 的 staged form。
-- 不把 secret 写进 settings；用 `apiKeyEnv` + `ctx.credentials` / `SettingsSecretField`。
+- 新插件 entry id 默认取包名去掉 `@hmilyld/dsh-`；`dsh-beacon` 是历史例外。
+- 不把 `lib/` 提交进 git；发布由 `files` 白名单带产物。
+- 不手写 Typert wire descriptor；用 `@Remote` + 官方 `typertPlugin`。
+- 不在客户端直接读写 settings 文档；用 `@hmilyld/dsh-plugin-kit` 的 staged form。
+- 不把 secret 写进 settings；用 `apiKeyEnv` + `ctx.credentials` / `SettingsCredentialField`。
 - 不在客户端直接操作 DOM 或做设置页导航；用官方 slot 与 `ctx.pluginNavigation`。
 - `remote.<namespace>` 必须用 `ctx.inject([...])` 等待 `$mount` 之后的服务；顶层 `inject` 只能写 `remote`。
-- 每个插件的设置页都必须展示更新提示：用 `@hmilyld/dsh-plugin-updates` 的 `createUpdateStore` + `UpdateNotice`，版本取 `__PKG_VERSION__`，链接到本包 `CHANGELOG.md`。
-- 每个用户可见改动都要有 changeset；`CHANGELOG.md` 必须进 `files`，所有包统一从本仓库发布到 npm。
+- 每个插件设置页必须用 Kit 展示更新提示；版本取 `__PKG_VERSION__`，链接到本包 `CHANGELOG.md`。
+- 每个用户可见改动都要有 changeset；`CHANGELOG.md` 必须进 `files`。
 
 ## 常见的坑
 
-- Typert 生成器只认工作区内的 `@deepseek-ai/dsh-typert-protocol` 声明。我们通过 `src/typert-protocol.d.ts` + `tsconfig.json` 的 `paths` 提供 ambient shim；删掉它生成器会报 “has no Remote methods”。
-- `@deepseek-ai/dsh-client-ui-slots` 的声明文件引用 `@deepseek-ai/dsh-client-store`，但官方包只把它放在 devDependencies。客户端包必须自己加 `@deepseek-ai/dsh-client-store` 到 devDependencies，否则 `InjectFace` 会退化成 `any`。
-- Schemastery 的 `Config` 不要写 `: Schema<Config>` 显式注解，`volatile()` 的推断类型会和 `Volatile<T>` 接口冲突。
-- `tsconfig` 的 `rootDir: src` 下，客户端 `paths` 指向 `lib/*.d.ts` 是允许的；不要把生成的 `.d.ts` 放进 `include`。
-- 本地 `dsh plugin add <path>` 安装的是软链，Host 运行时从包的真实路径解析依赖；因此包目录里必须已经有 `pnpm install` 后的 `node_modules`，并且 `lib/` 已构建。
+- Typert 生成器只认工作区内的 `@deepseek-ai/dsh-typert-protocol` 声明。Kit 提供 `src/typert-protocol.d.ts` ambient shim；插件 `tsconfig.json` 用 `paths` 指过去。
+- 官方 `dsh-client-ui-slots` 的 d.ts 引用 `dsh-client-store`，但后者不在其依赖里；客户端包必须自己把 `@deepseek-ai/dsh-client-store` 放进 devDependencies。
+- Schemastery 的 `Config` 不要写 `: Schema<Config>` 显式注解。
+- `tsc -b` 在删除 `lib/` 后仍可能认为输出是最新的；`build-package.mjs` 使用 `--force`。
+- vitest 不能直接 transform 标准装饰器；Service 测试导入 `lib/index.js`，不要导入 `src/index.ts`。
+- `lib/client.js` 是 CJS 的 ModuleLoader 产物，publint 会提示应按 `.cjs` 解释；这是浏览器加载器契约，不是 Node ESM，保留警告。
+- 本地 `dsh plugin add <path>` 安装的是软链，包目录里必须已有 `pnpm install` 后的 `node_modules` 与构建好的 `lib/`。

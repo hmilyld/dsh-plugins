@@ -13,10 +13,15 @@ catalog:
   "@deepseek-ai/dsh-typert-generator": "0.2.0-rc.2"
   "@types/node": "^24.19.1"
   "@types/react": "^18.3.31"
-  esbuild: "^0.28.2"
+  clsx: "^2.1.1"
   react: "^18.3.1"
   react-dom: "^18.3.1"
+  tsdown: "^0.22.2"
+  oxlint: "1.81.0"
+  oxlint-tsgolint: "7.0.2001"
+  publint: "^0.3.24"
   typescript: "6.0.3"
+  vitest: "^4.1.11"
   "@types/react-dom": "^18.3.7"
 
   # DSH platform packages the plugins build against. Kept at the exact release

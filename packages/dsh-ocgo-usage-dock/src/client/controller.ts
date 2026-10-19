@@ -26,24 +26,25 @@ import {
   type SettingsFormShell,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { UsageSnapshot } from '@hmilyld/dsh-ocgo-usage-dock/types'
-import { createUpdateStore, type UpdateStore } from '@hmilyld/dsh-plugin-updates'
+import {
+  createStore,
+  createUpdateStore,
+  type Store,
+  type UpdateStore,
+  type WritableStore,
+} from '@hmilyld/dsh-plugin-kit'
 import {
   DEFAULT_API_KEY_ENV,
   DEFAULT_REFRESH_INTERVAL_MS,
   MIN_REFRESH_INTERVAL_MS,
   MIN_TIMEOUT_MS,
 } from './constants.ts'
-import { createStore, type Store, type WritableStore } from './store.ts'
 
 /** Loader entry id; also the settings namespace this plugin serves. */
 export const ENTRY_ID = 'ocgo-usage-dock'
 
 /** Bundle package name keyed by the Plugins page's bundle card. */
 export const PACKAGE_NAME = '@hmilyld/dsh-ocgo-usage-dock'
-
-/** Per-package changelog linked from the update notice. */
-export const CHANGELOG_URL =
-  'https://github.com/hmilyld/dsh-plugins/blob/main/packages/dsh-ocgo-usage-dock/CHANGELOG.md'
 
 /** Form field that stages the write-only credential. */
 const SECRET_FIELD = 'apiKeyDraft'
@@ -140,6 +141,7 @@ export class OcgoClientController {
   private credential: CredentialState = { ref: DEFAULT_API_KEY_ENV, configured: false, writable: true }
   private timer: ReturnType<typeof setTimeout> | undefined
   private inflight: Promise<void> | undefined
+  private inflightForce = false
   private disposed = false
 
   /**
@@ -266,7 +268,8 @@ export class OcgoClientController {
 
   /** Write the staged credential to the reference the form names. */
   private async writeKey(value: string): Promise<boolean> {
-    await this.ctx.remote.credentials.set(this.ref(), value)
+    const result = await this.ctx.remote.credentials.set(this.ref(), value)
+    if (!result.ok) return false
     await this.readCredential()
     return this.credential.configured
   }
@@ -301,8 +304,18 @@ export class OcgoClientController {
   private async refresh(force: boolean): Promise<void> {
     if (this.disposed) return
     if (this.inflight !== undefined) {
+      // A normal poll joins the request in flight. A forced refresh joins a
+      // forced request, but waits out a normal poll and then starts a fresh one
+      // so saving a new key mid-poll is not masked by the old configuration.
+      if (!force || this.inflightForce) {
+        await this.inflight
+        return
+      }
       await this.inflight
-      return
+      if (this.inflight !== undefined && this.inflightForce) {
+        await this.inflight
+        return
+      }
     }
     this.dockStore.set({ ...this.dockStore.getSnapshot(), loading: true, transportError: null })
     const run = (async () => {
@@ -328,10 +341,12 @@ export class OcgoClientController {
         })
       } finally {
         this.inflight = undefined
+        this.inflightForce = false
         this.reschedule(this.dockStore.getSnapshot().transportError !== null)
       }
     })()
     this.inflight = run
+    this.inflightForce = force
     await run
   }
 }

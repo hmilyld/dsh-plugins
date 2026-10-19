@@ -132,9 +132,9 @@ export function apply(ctx: Context, config: Config): void {
   const logger = ctx.logger('dsh-beacon')
 
   /** 统一日志出口：fiber 卸载后 logger 可能抛错，日志失败绝不能影响流程。 */
-  function log(level: 'error' | 'info' | 'warn' | 'debug', message: string): void {
+  function log(level: 'error' | 'info' | 'warn' | 'debug', text: string): void {
     try {
-      logger[level](message)
+      logger[level](text)
     } catch {
       /* 日志服务不可用时静默忽略 */
     }
@@ -443,18 +443,18 @@ export function apply(ctx: Context, config: Config): void {
         return
       }
       case 'tool/call': {
-        const { callId, name, arguments: rawArgs } = event.data
-        if (name !== 'ask_user_question' && name !== 'exit_plan_mode') return
+        const { callId, name: toolName, arguments: rawArgs } = event.data
+        if (toolName !== 'ask_user_question' && toolName !== 'exit_plan_mode') return
         // 提问开关关闭时连兜底定时器都不注册；子代理的工具路径直接跳过
         // （未入 pendingCalls，后续 tool/result 也无从触发）。
-        if (name === 'ask_user_question' && !read(config.triggerOnUserQuestion)) return
+        if (toolName === 'ask_user_question' && !read(config.triggerOnUserQuestion)) return
         if (read(config.skipSubagents) && session.header.origin === 'subagent') return
         const summary =
-          name === 'exit_plan_mode' ? planSummary(rawArgs) : 'Agent 正在等待你的选择'
-        trackCall(callId, { toolName: name, summary })
+          toolName === 'exit_plan_mode' ? planSummary(rawArgs) : 'Agent 正在等待你的选择'
+        trackCall(callId, { toolName, summary })
         const timer = schedule(() => {
           fallbackTimers.delete(callId)
-          fire(eventTypeFor(name), summary, sessionId)
+          fire(eventTypeFor(toolName), summary, sessionId)
           // 无论本次是真发还是被去重合并，该 call 都算已覆盖。
           coverCall(callId)
         }, FALLBACK_DELAY_MS)

@@ -11,16 +11,24 @@
     "build": "pnpm -r --filter \"./packages/*\" run build",
     "typecheck": "tsc -b tsconfig.host.json tsconfig.client.json",
     "test": "pnpm -r --filter \"./packages/*\" run test",
-    "check": "pnpm run build && pnpm run test",
+    "check": "pnpm run build && pnpm run lint && pnpm run test",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "pnpm run build && changeset publish"
+    "release": "changeset publish",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "pack:check": "pnpm --filter @hmilyld/dsh-beacon --filter @hmilyld/dsh-ocgo-usage-dock exec publint",
+    "gen:plugin": "node tooling/scaffold/index.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "catalog:",
     "@deepseek-ai/dsh-typert-generator": "catalog:",
-    "@types/node": "^24.19.1",
-    "esbuild": "^0.28.2",
-    "typescript": "6.0.3"
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "tsdown": "catalog:",
+    "vitest": "catalog:",
+    "oxlint": "catalog:",
+    "oxlint-tsgolint": "catalog:",
+    "publint": "catalog:"
   }
 }

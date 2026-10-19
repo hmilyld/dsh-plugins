@@ -1,7 +1,5 @@
 /** Locale bundles for the usage dock and its settings page. */
 
-import type { SettingsFormLabels } from '@deepseek-ai/dsh-client-ui-primitives'
-
 /** Namespace shared by the dock and the settings card. */
 export const NS = 'settings.ocgoUsage'
 
@@ -161,19 +159,4 @@ export const zh: Record<OcgoLocaleKey, string> = {
   invalidNumber: '请填数字；留空表示使用默认值。',
   updateAvailable: '发现新版本 v{latest}（当前 v{current}）。',
   updateChangelog: '查看更新说明',
-}
-
-/**
- * The shared settings form's copy.
- * @param t - namespace-bound translator.
- * @returns labels the form frame renders.
- */
-export function formLabels(t: (key: OcgoLocaleKey) => string): SettingsFormLabels {
-  return {
-    unavailable: t('unavailable'),
-    readOnly: t('readOnly'),
-    saveFailed: t('saveFailed'),
-    save: t('save'),
-    saving: t('saving'),
-  }
 }

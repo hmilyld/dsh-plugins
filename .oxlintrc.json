@@ -1,0 +1,13 @@
+{
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "no-underscore-dangle": "off",
+    "typescript/no-extraneous-class": "off",
+    "unicorn/consistent-function-scoping": "off",
+    "unicorn/require-module-specifiers": "off"
+  },
+  "ignorePatterns": ["**/lib/**", "**/node_modules/**"]
+}

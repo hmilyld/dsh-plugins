@@ -7,6 +7,10 @@ on:
 
 jobs:
   check:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +21,20 @@ jobs:
           version: 12.5.1
       - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ matrix.node }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: No nested workflows
+        run: |
+          if find packages -path '*/.github/workflows/*' -print -quit | grep -q .; then
+            echo '::error::package-level workflows are not allowed'
+            exit 1
+          fi
+      - name: Build output is not committed
+        run: |
+          if git ls-files 'packages/*/lib/**' | grep -q .; then
+            echo '::error::lib/ must not be tracked'
+            exit 1
+          fi
       - run: pnpm run check
+      - run: pnpm run pack:check

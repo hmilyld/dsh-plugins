@@ -15,6 +15,7 @@ dist/
 
 # Local secrets / scratch config (never commit real keys)
 packages/*/scripts/send-test.config.json
+packages/*/examples/send-test.config.json
 packages/*/.dsh-*
 
 # Editor
