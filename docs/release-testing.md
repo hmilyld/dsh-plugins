@@ -1,4 +1,38 @@
-# 发布流程测试清单（明天）
+# 发布流程测试清单
+
+## 当前状态（2026-10-20）
+
+- 本地版本：`@hmilyld/dsh-beacon@0.3.0`、`@hmilyld/dsh-ocgo-usage-dock@0.3.0`。
+- npm：beacon 已发布到 `0.2.2`；ocgo 仍是 404（未发布）。
+- `pnpm publish --dry-run` 两个包均已通过（含 `prepublishOnly` 的 build + test）。
+- 本机 npm 未登录（`npm whoami` 返回 401）。
+- GitHub 仓库还没有 remote；`gh` 已登录 `hmilyld`。
+- 私有 Kit `@hmilyld/dsh-plugin-kit` 不发布，`pnpm publish` 会把它替换成 `0.0.0` 放进 devDependencies。
+
+### 今天最短路径（手动 bootstrap）
+
+```bash
+# 1. 登录官方 registry（2FA）
+npm login --registry=https://registry.npmjs.org/
+npm whoami --registry=https://registry.npmjs.org/
+
+# 2. 先发 ocgo（新包必须先 bootstrap）
+cd packages/dsh-ocgo-usage-dock
+pnpm publish --registry=https://registry.npmjs.org/ --access public --otp=<6位动态码>
+
+# 3. 再发 beacon
+cd ../dsh-beacon
+pnpm publish --registry=https://registry.npmjs.org/ --access public --otp=<新的6位动态码>
+
+# 4. 验证
+npm view @hmilyld/dsh-ocgo-usage-dock@0.3.0 version --registry=https://registry.npmjs.org/
+npm view @hmilyld/dsh-beacon@0.3.0 version --registry=https://registry.npmjs.org/
+```
+
+两个包都发布成功后，再到 npm 包设置里配置 Trusted Publisher（见下方前置条件），最后创建并推送 GitHub 仓库，后续才走 Changesets + OIDC。
+
+> 不要用 `npm publish`：它不会替换 `workspace:*`，packed devDependencies 里会残留 workspace 协议。统一用 `pnpm publish`。
+
 
 本文件记录发布链路中尚未在真实 npm 上验证的部分。明天按顺序执行，任何一步失败先停，不要继续发第二个包。
 
