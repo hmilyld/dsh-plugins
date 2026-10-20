@@ -29,3 +29,9 @@
 - **现象**：publint 提示 `exports["./client"].default` 是 CJS 但按 ESM 解释，建议 `.cjs`。
 - **原因**：该文件不是 Node 模块，而是 DSH 浏览器 ModuleLoader 的 closure factory；官方插件同样使用 `lib/client.js`。
 - **处理**：保留 `.js`，接受 publint warning；不要改为 `.cjs`，否则模块表路径与官方契约不一致。
+
+## 6. `conversation.composer.dock` 换行样式
+
+- **偏差**：官方 composer dock 是单行 `display:flex`，没有 `flex-wrap`。用量条要落在自带 token 用量下一行，只能在插件里注入一条 `[data-composer-dock]{flex-wrap:wrap}`。
+- **处理**：样式只作用于官方稳定 data 属性，插件卸载时移除；entry 使用 `flex: 1 0 100%; order: 10` 占满下一行。
+- **复核**：若官方后续提供多行 composer dock 或独立“below token meter”slot，删除这条注入。

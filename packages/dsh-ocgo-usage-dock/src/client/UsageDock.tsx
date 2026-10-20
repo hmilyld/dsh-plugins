@@ -1,4 +1,4 @@
-/** Full-width usage row above the composer. */
+/** Usage row below the composer, on the line after the built-in token meter. */
 import type { CSSProperties } from 'react'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { UsageSnapshot, UsageWindow } from '@hmilyld/dsh-ocgo-usage-dock/types'
@@ -7,7 +7,7 @@ import type { OcgoLocaleKey } from './locales.ts'
 import { NS } from './locales.ts'
 
 /** Props the dock slot hands the component. */
-export type UsageDockProps = PropsRuntime<'conversation.input.dock'> &
+export type UsageDockProps = PropsRuntime<'conversation.composer.dock'> &
   PropsLocale<typeof NS> &
   InjectFace<DockFace>
 
@@ -163,6 +163,8 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     justifyContent: 'center',
     width: '100%',
+    flex: '1 0 100%',
+    order: 10,
     padding: '2px 12px 4px',
     minWidth: 0,
   },

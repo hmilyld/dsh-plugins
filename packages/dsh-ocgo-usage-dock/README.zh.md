@@ -2,11 +2,12 @@
 
 [English](README.md) | 中文
 
-DSH（DeepSeek Harness）Web 插件：在 **输入框上方整行** 显示 OpenCode Go 的 5 小时滚动、本周、本月用量，并在插件页提供配置。数据由 Host 侧的 Typert Remote 提供，密钥存放在 DSH 的 credentials 里，不写进 settings 文件。
+DSH（DeepSeek Harness）Web 插件：在 **输入框下方、DSH 自带 token 用量下一行** 显示 OpenCode Go 的 5 小时滚动、本周、本月用量，并在插件页提供配置。数据由 Host 侧的 Typert Remote 提供，密钥存放在 DSH 的 credentials 里，不写进 settings 文件。
 
 ```text
-OpenCode Go 用量   5 小时 ▓▓▓░░ 29%   本周 ▓▓▓▓░ 84%   本月 ▓▓░░░ 46%   ⟳  ⚙
 [输入框]
+[DSH 自带 token 用量]
+OpenCode Go 用量   5 小时 ▓▓▓░░ 29%   本周 ▓▓▓▓░ 84%   本月 ▓▓░░░ 46%   ⟳  ⚙
 ```
 
 - 鼠标悬停任一窗口可看重置时间。
@@ -96,7 +97,7 @@ OpenCode Go 返回的是 `api_key_expired` 或类似认证错误，说明当前�
 ## 实现
 
 - **Host**：`src/index.ts` 默认导出一个 `TypertRemoteService`，提供 `ocgoUsage/snapshot`。`src/usage.ts` 负责配置展开、密钥解析、响应归一化、超时/网络错误折叠；缓存按当前刷新间隔失效，并发请求 single-flight。
-- **Client**：`src/client/index.tsx` 先 `ctx.remote.$mount(./remote)`，再用 `ctx.inject(['remote.ocgoUsage', ...])` 等命名空间就绪；一个 controller 统一管理设置表单、credentials 状态和唯一一条轮询。`UsageDock` 注册到 `conversation.input.dock`，`SettingsCard` 注册到 `plugins.bundle.config`，并使用 `@hmilyld/dsh-plugin-kit` 的统一设置外壳、密钥控件与更新提示。
+- **Client**：`src/client/index.tsx` 先 `ctx.remote.$mount(./remote)`，再用 `ctx.inject(['remote.ocgoUsage', ...])` 等命名空间就绪；一个 controller 统一管理设置表单、credentials 状态和唯一一条轮询。`UsageDock` 注册到 `conversation.composer.dock`，`SettingsCard` 注册到 `plugins.bundle.config`，并使用 `@hmilyld/dsh-plugin-kit` 的统一设置外壳、密钥控件与更新提示。
 - **生成**：`@Remote` 方法由官方 Typert 生成器产出 `lib/typert.host.*` 与 `lib/typert.remote-client.*`，客户端 bundle 直接包含生成的 Remote 与 zod schema。
 
 ## 开发

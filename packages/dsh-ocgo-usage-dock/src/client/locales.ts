@@ -63,7 +63,7 @@ export type OcgoLocaleKey =
 export const en: Record<OcgoLocaleKey, string> = {
   title: 'OpenCode Go usage',
   description:
-    'Show OpenCode Go rolling, weekly, and monthly usage above the composer, using a key stored outside the settings file.',
+    'Show OpenCode Go rolling, weekly, and monthly usage below the composer, on the line after the built-in token meter, with the key stored outside the settings file.',
   dockLabel: 'OpenCode Go usage',
   windowRolling: '5-hour',
   windowWeekly: 'Weekly',
@@ -117,7 +117,7 @@ export const en: Record<OcgoLocaleKey, string> = {
 export const zh: Record<OcgoLocaleKey, string> = {
   title: 'OpenCode Go 用量',
   description:
-    '在输入框上方显示 OpenCode Go 的 5 小时、每周与每月用量；密钥保存在设置文件之外。',
+    '在输入框下方、DSH 自带 token 用量下一行显示 OpenCode Go 的 5 小时、每周与每月用量；密钥保存在设置文件之外。',
   dockLabel: 'OpenCode Go 用量',
   windowRolling: '5 小时',
   windowWeekly: '本周',

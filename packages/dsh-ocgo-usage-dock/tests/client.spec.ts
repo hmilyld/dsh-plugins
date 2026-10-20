@@ -47,5 +47,7 @@ describe('client bundle', () => {
     expect(source).toContain('ocgoUsage/snapshot')
     expect(source).toContain('registry.npmjs.org')
     expect(source).toContain('blob/main/packages/dsh-ocgo-usage-dock/CHANGELOG.md')
+    expect(source).toContain('conversation.composer.dock')
+    expect(source).toContain('[data-composer-dock]{flex-wrap:wrap}')
   })
 })

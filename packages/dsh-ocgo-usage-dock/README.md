@@ -2,11 +2,12 @@
 
 English | [中文](README.zh.md)
 
-A DeepSeek Harness (DSH) web plugin that shows OpenCode Go's 5-hour, weekly, and monthly usage on a full-width row above the composer. The Host serves the data through a Typert Remote service; the API key lives in DSH credentials, never in the settings document.
+A DeepSeek Harness (DSH) web plugin that shows OpenCode Go's 5-hour, weekly, and monthly usage on a full-width row below the composer, on the line after the built-in token meter. The Host serves the data through a Typert Remote service; the API key lives in DSH credentials, never in the settings document.
 
 ```text
-OpenCode Go usage   5-hour ▓▓▓░░ 29%   Weekly ▓▓▓▓░ 84%   Monthly ▓▓░░░ 46%   ⟳  ⚙
 [composer]
+[built-in token usage]
+OpenCode Go usage   5-hour ▓▓▓░░ 29%   Weekly ▓▓▓▓░ 84%   Monthly ▓▓░░░ 46%   ⟳  ⚙
 ```
 
 - Hover a window to see its reset time.
@@ -94,7 +95,7 @@ Press **Save**. The Host invalidates its cache and the next request uses the new
 ## Implementation
 
 - **Host**: a default-exported `TypertRemoteService` provides `ocgoUsage/snapshot`. Pure logic in `src/usage.ts` handles config unwrapping, key resolution, response normalization, and error folding. The cache expires against the current interval and concurrent reads share one request.
-- **Client**: `src/client/index.tsx` mounts `./remote`, then waits for `ctx.inject(['remote.ocgoUsage', ...])`. One controller owns the staged settings form, the credential badge, and the single polling loop. `UsageDock` registers on `conversation.input.dock`; `SettingsCard` registers on `plugins.bundle.config` and is built from `@hmilyld/dsh-plugin-kit` (settings shell, credential field, update notice).
+- **Client**: `src/client/index.tsx` mounts `./remote`, then waits for `ctx.inject(['remote.ocgoUsage', ...])`. One controller owns the staged settings form, the credential badge, and the single polling loop. `UsageDock` registers on `conversation.composer.dock`; `SettingsCard` registers on `plugins.bundle.config` and is built from `@hmilyld/dsh-plugin-kit` (settings shell, credential field, update notice).
 - **Generation**: `@Remote` methods are emitted by the official Typert generator into `lib/typert.host.*` and `lib/typert.remote-client.*`; the client bundle includes the generated Remote and its zod schemas.
 
 ## Development

@@ -52,15 +52,24 @@ export async function apply(ctx: Context): Promise<() => Promise<void>> {
 /** Register the controller, dictionaries, and both slots on the scoped context. */
 function mountUi(ctx: Context): void {
   const controller = new OcgoClientController(ctx)
+  // The official composer dock is a single non-wrapping flex row. Let it wrap
+  // so the full-width usage row can sit on the line below the token meter.
+  ctx.effect(() => {
+    const style = document.createElement('style')
+    style.dataset.ocgoUsageDock = ''
+    style.textContent = '[data-composer-dock]{flex-wrap:wrap}'
+    document.head.appendChild(style)
+    return () => style.remove()
+  }, 'ocgo-usage-dock: composer dock wrap')
   ctx.effect(() => () => controller.dispose(), 'ocgo-usage-dock: controller')
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ocgo-usage-dock: dictionaries')
   ctx.effect(
     () =>
       ctx.configForms.whileServed([ENTRY_ID], () => {
-        const offDock = ctx.slots.inject('conversation.input.dock', () =>
+        const offDock = ctx.slots.inject('conversation.composer.dock', () =>
           ctx.slots.register(
             {
-              name: 'conversation.input.dock',
+              name: 'conversation.composer.dock',
               id: 'ocgo-usage-dock',
               order: 10,
               locale: NS,
