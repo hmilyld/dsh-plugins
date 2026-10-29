@@ -17,7 +17,7 @@
     "release": "changeset publish",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
-    "pack:check": "pnpm --filter @hmilyld/dsh-beacon --filter @hmilyld/dsh-ocgo-usage-dock exec publint",
+    "pack:check": "pnpm --filter @hmilyld/dsh-beacon --filter @hmilyld/dsh-ocgo-usage-dock --filter @hmilyld/dsh-opencode-import exec publint",
     "gen:plugin": "node tooling/scaffold/index.mjs"
   },
   "devDependencies": {

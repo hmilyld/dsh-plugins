@@ -1,0 +1,8 @@
+# @hmilyld/dsh-opencode-import bundle layer.
+#
+# `id` is both the Loader entry id and the settings namespace served to the
+# browser half. `name` must match package.json. Every default lives on the
+# Schemastery fields in src/config.ts, so this layer states no config values.
+- insert:
+    - id: opencode-import
+      name: '@hmilyld/dsh-opencode-import'

@@ -25,6 +25,7 @@ pnpm --filter @hmilyld/dsh-ocgo-usage-dock run test
 
 - `packages/dsh-beacon`：事件监听 + webhook 插件。
 - `packages/dsh-ocgo-usage-dock`：Typert Remote + credentials + dock 的完整参考。
+- `packages/dsh-opencode-import`：只读扫描 OpenCode SQLite，把会话导入为真实 DSH 会话。
 - `packages/dsh-plugin-kit`：private 设置/更新 Kit，打包进插件，不发 npm。
 - `tooling/tsdown.preset.mjs`：共享 tsdown 配置（host ESM / client CJS ModuleLoader）。
 - `tooling/build/build-package.mjs`：单包两段式构建（tsc → tsdown host → tsc → tsdown client）。
@@ -45,7 +46,7 @@ pnpm --filter @hmilyld/dsh-ocgo-usage-dock run test
 
 ## 常见的坑
 
-- Typert 生成器只认工作区内的 `@deepseek-ai/dsh-typert-protocol` 声明。Kit 提供规范的 `src/typert-protocol.d.ts` ambient shim；Typert 插件复制到自己的 `src/`，并让 `tsconfig.json` 的 `paths` 指向本包副本（直接引用 Kit 路径生成器识别不到）。
+- Typert 生成器只认工作区内的 `@deepseek-ai/dsh-typert-protocol` 声明。仓库根 `typert-protocol.d.ts` 是唯一 ambient shim；Typert 插件在 `src/index.ts` 用 `/// <reference path="../../../typert-protocol.d.ts" />` 引入，不要在包内复制副本（重复声明会让生成器把第二个包判成跨包引用）。
 - 官方 `dsh-client-ui-slots` 的 d.ts 引用 `dsh-client-store`，但后者不在其依赖里；客户端包必须自己把 `@deepseek-ai/dsh-client-store` 放进 devDependencies。
 - Schemastery 的 `Config` 不要写 `: Schema<Config>` 显式注解。
 - `tsc -b` 在删除 `lib/` 后仍可能认为输出是最新的；`build-package.mjs` 使用 `--force`。

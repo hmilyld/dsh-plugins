@@ -13,6 +13,9 @@
     },
     {
       "path": "./packages/dsh-ocgo-usage-dock/tsconfig.client.json"
+    },
+    {
+      "path": "./packages/dsh-opencode-import/tsconfig.client.json"
     }
   ]
 }

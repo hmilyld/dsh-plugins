@@ -6,11 +6,6 @@
     "types": [
       "node"
     ],
-    "paths": {
-      "@deepseek-ai/dsh-typert-protocol": [
-        "./src/typert-protocol.d.ts"
-      ]
-    },
     "tsBuildInfoFile": "tsconfig.tsbuildinfo"
   },
   "include": [
@@ -19,6 +14,6 @@
     "src/constants.ts",
     "src/types.ts",
     "src/usage.ts",
-    "src/typert-protocol.d.ts"
+    "../../typert-protocol.d.ts"
   ]
 }

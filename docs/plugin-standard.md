@@ -24,7 +24,7 @@ packages/dsh-<name>/
     types.ts              # 跨半边 wire 类型
     logic.ts              # 纯逻辑，无 cordis 依赖
     constants.ts          # 默认值/常量
-    typert-protocol.d.ts  # 仅 Typert 插件；从 Kit 复制/引用
+    # Typert 插件：src/index.ts 用 /// <reference> 引用仓库根 typert-protocol.d.ts
     client/
       index.tsx           # apply/inject、mount remote、注册 slot
       controller.ts       # 表单 + stores + 轮询
@@ -88,7 +88,7 @@ DSH_BUILD_FACE=client tsdown         → lib/client.js
 
 ### 3.4 Typert 偏差
 
-协议来自 npm，不在 workspace 内。Kit 提供规范的 `typert-protocol.d.ts` ambient shim；Typert 插件把它**复制到自己的 `src/typert-protocol.d.ts`**，并用 `tsconfig.json` 的 `paths` 指向本包副本（生成器按包根解析，直接引用 Kit 路径会失效）。构建仍使用官方 `typertPlugin`（package 模式），产物 import 真实协议包。
+协议来自 npm，不在 workspace 内。仓库根 `typert-protocol.d.ts` 提供唯一的 ambient shim；Typert 插件在 `src/index.ts` 顶部用 `/// <reference path="../../../typert-protocol.d.ts" />` 引入，`tsconfig.json` 不写 `paths`。不要在每个包里复制副本：生成器把 workspace 内所有包放进同一个 program，重复的 ambient 声明会让第二个包被判成跨包引用。构建仍使用官方 `typertPlugin`（package 模式），产物 import 真实协议包。
 
 ## 4. package.json
 

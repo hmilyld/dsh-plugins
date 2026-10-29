@@ -10,6 +10,7 @@ hmilyld 的 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)�
 | --- | --- |
 | [`@hmilyld/dsh-beacon`](./packages/dsh-beacon) | 任务完成、提问、计划确认、审批时的 webhook 通知。 |
 | [`@hmilyld/dsh-ocgo-usage-dock`](./packages/dsh-ocgo-usage-dock) | 输入框下方、token 用量下一行的 OpenCode Go 用量条，Host 侧通过 Typert Remote 提供数据，密钥存放在 credentials。 |
+| [`@hmilyld/dsh-opencode-import`](./packages/dsh-opencode-import) | 把工作区的 OpenCode 会话导入 DSH 会话列表，成为可打开、可继续的真实会话；Host 侧只读扫描 OpenCode SQLite。 |
 | `@hmilyld/dsh-plugin-kit`（private） | 内部设置/更新/测试 Kit，打包进插件，不单独发布。 |
 
 每个插件的设置页都会检查 npm `latest`，发现新版本时显示版本号与对应 `CHANGELOG.md` 链接。

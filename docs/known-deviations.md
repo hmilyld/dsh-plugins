@@ -5,8 +5,9 @@
 ## 1. Typert 协议 ambient shim
 
 - **偏差**：官方仓库把 `@deepseek-ai/dsh-typert-protocol` 作为 workspace 包，生成器可直接识别 `@Remote` / `TypertRemoteService`。我们消费 npm 上的协议包，符号位于 workspace 之外，生成器会认为没有 Remote 方法。
-- **处理**：`@hmilyld/dsh-plugin-kit` 提供 `typert-protocol.d.ts` ambient 声明；插件 `tsconfig.json` 用 `paths` 指向它。编译产物仍 import 真实协议包。
-- **复核**：每次 DSH 升级后确认 `Remote` / `TypertRemoteService` / `RemoteResult` / `TypertRemoteContribution` 的签名未变。
+- **处理**：仓库根 `typert-protocol.d.ts` 是唯一一份 ambient 声明；Typert 插件的 `src/index.ts` 用 `/// <reference path="../../../typert-protocol.d.ts" />` 引入，`tsconfig.json` 不再写 `paths`。根文件只参与构建，不发布。
+- **为什么不是每包一份**：生成器把 workspace 内所有包放进同一个 TypeScript program，多个包各自声明同名 ambient module 时只会认第一个声明，第二个包的 `extends TypertRemoteService` 会被判成跨包引用并报 `package reference TypertRemoteService is not exported ...`。
+- **复核**：每次 DSH 升级后确认 `Remote` / `TypertRemoteService` / `RemoteResult` / `TypertRemoteContribution` 的签名未变；若生成器改为按包独立分析，可改回每包一份。
 
 ## 2. 更新检测走 Client
 
