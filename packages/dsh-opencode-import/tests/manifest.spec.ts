@@ -55,6 +55,13 @@ describe('package manifest', () => {
     expect(pkg.engines.dsh).toBe('>=0.2.0-rc.2 <0.3.0')
   })
 
+  it('refuses to publish through a client that cannot resolve workspace protocols', () => {
+    // npm copies `catalog:` and `workspace:*` into the published manifest, which
+    // makes the tarball uninstallable; pnpm resolves both first.
+    expect(pkg.scripts.prepublishOnly).toContain('verify-publish-client.mjs')
+    expect(existsSync(join(root, '../../tooling/build/verify-publish-client.mjs'))).toBe(true)
+  })
+
   it('has no committed build output or package-level workflow', () => {
     expect(existsSync(join(root, '.github'))).toBe(false)
     expect(existsSync(join(root, 'scripts'))).toBe(false)

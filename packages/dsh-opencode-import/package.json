@@ -1,6 +1,6 @@
 {
   "name": "@hmilyld/dsh-opencode-import",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Imports OpenCode sessions of a workspace into the DeepSeek Harness session list as real, openable DSH sessions.",
   "type": "module",
   "main": "lib/index.js",
@@ -61,7 +61,7 @@
     "build": "node ../../tooling/build/build-package.mjs .",
     "typecheck": "tsc -b tsconfig.json tsconfig.client.json",
     "test": "pnpm run build && pnpm -w exec vitest run packages/dsh-opencode-import",
-    "prepublishOnly": "pnpm run build && pnpm run test"
+    "prepublishOnly": "node ../../tooling/build/verify-publish-client.mjs && pnpm run build && pnpm run test"
   },
   "keywords": [
     "dsh",

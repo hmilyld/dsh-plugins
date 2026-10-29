@@ -2,8 +2,10 @@
 
 ## 当前状态（2026-10-20）
 
-- 本地版本：`@hmilyld/dsh-beacon@0.3.0`、`@hmilyld/dsh-ocgo-usage-dock@0.3.0`。
-- npm：beacon 已发布到 `0.2.2`；ocgo 仍是 404（未发布）。
+- 本地版本：`@hmilyld/dsh-beacon@0.3.0`、`@hmilyld/dsh-ocgo-usage-dock@0.3.0`、`@hmilyld/dsh-opencode-import@0.1.1`。
+- npm：beacon `0.3.0`、ocgo `0.3.0`、opencode-import `0.1.1` 均已发布。
+- 事故记录：`dsh-opencode-import@0.1.0` 用 `npm publish` 发布，`catalog:` / `workspace:*` 未解析，
+  安装报 `ERR_PNPM_SPEC_NOT_SUPPORTED_BY_ANY_RESOLVER`；已用 `0.1.1` 重新发布并弃用 `0.1.0`。
 - `pnpm publish --dry-run` 两个包均已通过（含 `prepublishOnly` 的 build + test）。
 - 本机 npm 未登录（`npm whoami` 返回 401）。
 - GitHub 仓库还没有 remote；`gh` 已登录 `hmilyld`。
@@ -31,7 +33,9 @@ npm view @hmilyld/dsh-beacon@0.3.0 version --registry=https://registry.npmjs.org
 
 两个包都发布成功后，再到 npm 包设置里配置 Trusted Publisher（见下方前置条件），最后创建并推送 GitHub 仓库，后续才走 Changesets + OIDC。
 
-> 不要用 `npm publish`：它不会替换 `workspace:*`，packed devDependencies 里会残留 workspace 协议。统一用 `pnpm publish`。
+> 不要用 `npm publish`：它不会替换 `workspace:*` 或 `catalog:`，packed manifest 里会残留未解析协议，
+> 包直接装不上。统一用 `pnpm publish`；各包 `prepublishOnly` 已接入
+> `tooling/build/verify-publish-client.mjs`，用 npm 发布会当场失败。
 
 
 本文件记录发布链路中尚未在真实 npm 上验证的部分。明天按顺序执行，任何一步失败先停，不要继续发第二个包。
