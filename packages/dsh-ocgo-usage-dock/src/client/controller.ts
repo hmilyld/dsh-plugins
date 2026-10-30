@@ -29,6 +29,7 @@ import type { UsageSnapshot } from '@hmilyld/dsh-ocgo-usage-dock/types'
 import {
   createStore,
   createUpdateStore,
+  settingsBooleanField,
   type Store,
   type UpdateStore,
   type WritableStore,
@@ -56,6 +57,7 @@ export interface PluginConfig {
   refreshIntervalMs?: number
   timeoutMs?: number
   baseUrl?: string
+  showBars?: boolean
 }
 
 /** What the dock renders. */
@@ -66,6 +68,8 @@ export interface UsageDockState {
   loading: boolean
   /** Transport or assembly failure; Host-reported usage errors live in `snapshot`. */
   transportError: string | null
+  /** Whether each window draws its percentage bar. */
+  showBars: boolean
 }
 
 /** What the settings card renders. */
@@ -74,6 +78,7 @@ export interface SettingsState extends SettingsFormShell {
   refreshSeconds: SettingsFieldState
   timeoutSeconds: SettingsFieldState
   baseUrl: SettingsFieldState
+  showBars: SettingsFieldState
   apiKeyDraft: SettingsFieldState
   credentialConfigured: boolean
   credentialWritable: boolean
@@ -132,6 +137,7 @@ export class OcgoClientController {
     snapshot: null,
     loading: false,
     transportError: null,
+    showBars: true,
   })
   private readonly updateStore = createUpdateStore({
     packageName: PACKAGE_NAME,
@@ -159,6 +165,7 @@ export class OcgoClientController {
         secondsField('refreshIntervalMs', MIN_REFRESH_INTERVAL_MS / 1000),
         secondsField('timeoutMs', MIN_TIMEOUT_MS / 1000),
         settingsTextField('baseUrl'),
+        settingsBooleanField('showBars'),
       ],
       [{ field: SECRET_FIELD, write: (text) => this.writeKey(text) }],
     )
@@ -225,6 +232,7 @@ export class OcgoClientController {
       refreshSeconds: this.form.field('refreshIntervalMs'),
       timeoutSeconds: this.form.field('timeoutMs'),
       baseUrl: this.form.field('baseUrl'),
+      showBars: this.form.field('showBars'),
       apiKeyDraft: this.form.field(SECRET_FIELD),
       credentialConfigured: this.credential.configured,
       credentialWritable: this.credential.writable,
@@ -241,6 +249,11 @@ export class OcgoClientController {
       this.credential = { ref, configured: false, writable: true }
       void this.readCredential()
     }
+    // The dock reads the saved value, not the staged switch: toggling the
+    // control only changes the dock after Save, like every other field.
+    const showBars = this.showBars()
+    const dock = this.dockStore.getSnapshot()
+    if (dock.showBars !== showBars) this.dockStore.set({ ...dock, showBars })
     this.settingsStore.set(this.projection())
   }
 
@@ -302,6 +315,11 @@ export class OcgoClientController {
     return this.credential.configured
   }
 
+  /** Whether the saved configuration asks for the per-window bars. */
+  private showBars(): boolean {
+    return this.scope.getSnapshot().value?.showBars !== false
+  }
+
   /** Current refresh interval, clamped to the schema's documented minimum. */
   private intervalMs(): number {
     const value = this.scope.getSnapshot().value?.refreshIntervalMs
@@ -351,7 +369,12 @@ export class OcgoClientController {
         const result = await this.ctx.remote.ocgoUsage.snapshot(force)
         if (this.disposed) return
         if (result.ok) {
-          this.dockStore.set({ snapshot: result.value, loading: false, transportError: null })
+          this.dockStore.set({
+            ...this.dockStore.getSnapshot(),
+            snapshot: result.value,
+            loading: false,
+            transportError: null,
+          })
           this.publish()
         } else {
           this.dockStore.set({

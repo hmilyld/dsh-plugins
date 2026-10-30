@@ -33,15 +33,17 @@ const value = {
   refreshIntervalMs: 300_000,
   timeoutMs: 15_000,
   baseUrl: 'https://example.test/usage',
+  showBars: true,
 }
 
 /** A settings scope that records mutations and publishes nothing. */
-function fakeScope(result: boolean) {
+function fakeScope(result: boolean, overrides: Partial<typeof value> = {}) {
   const calls: unknown[] = []
+  const current = { ...value, ...overrides }
   const snapshot: SettingsFormScopeSnapshot<typeof value> = {
     status: 'ready',
-    value,
-    base: value,
+    value: current,
+    base: current,
     user: {},
     writable: true,
     revision: 4,
@@ -116,6 +118,36 @@ describe('legacy key migration', () => {
       await Promise.resolve()
       await Promise.resolve()
       expect(face.hooks.settings.getSnapshot().legacyClearFailed).toBe(true)
+    } finally {
+      controller.dispose()
+    }
+  })
+})
+
+describe('show bars setting', () => {
+  it('defaults to showing the bars and mirrors the saved value', async () => {
+    vi.stubGlobal('__PKG_VERSION__', VERSION)
+    vi.stubGlobal('fetch', async () => ({ ok: false, status: 404, json: async () => ({}) }))
+    const { scope } = fakeScope(true)
+    const { OcgoClientController } = await import('../src/client/controller.ts')
+    const controller = new OcgoClientController(fakeContext(scope) as never)
+    try {
+      expect(controller.dockFace().hooks.usageDock.getSnapshot().showBars).toBe(true)
+      expect(controller.settingsFace().hooks.settings.getSnapshot().showBars.text).toBe('true')
+    } finally {
+      controller.dispose()
+    }
+  })
+
+  it('hides the bars when the saved value is false', async () => {
+    vi.stubGlobal('__PKG_VERSION__', VERSION)
+    vi.stubGlobal('fetch', async () => ({ ok: false, status: 404, json: async () => ({}) }))
+    const { scope } = fakeScope(true, { showBars: false })
+    const { OcgoClientController } = await import('../src/client/controller.ts')
+    const controller = new OcgoClientController(fakeContext(scope) as never)
+    try {
+      expect(controller.dockFace().hooks.usageDock.getSnapshot().showBars).toBe(false)
+      expect(controller.settingsFace().hooks.settings.getSnapshot().showBars.text).toBe('false')
     } finally {
       controller.dispose()
     }

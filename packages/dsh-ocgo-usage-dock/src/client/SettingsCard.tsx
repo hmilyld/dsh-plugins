@@ -3,6 +3,7 @@ import {
   formLabels,
   PluginSettingsForm,
   SettingsCredentialField,
+  SettingsToggleField,
   SettingsValueField,
 } from '@hmilyld/dsh-plugin-kit'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
@@ -116,6 +117,19 @@ export function SettingsCard(props: SettingsCardProps) {
         onEdit={(text) => props.edit('baseUrl', text)}
         onReset={() => props.resetField('baseUrl')}
         placeholder="https://opencode.ai/zen/go/v1/usage"
+      />
+      <SettingsToggleField
+        id="ocgo-show-bars"
+        label={t('showBars')}
+        hint={t('showBarsHint')}
+        checked={state.showBars.text !== 'false'}
+        overridden={state.showBars.overridden}
+        disabled={disabled}
+        onToggle={(next) => props.edit('showBars', String(next))}
+        onReset={() => props.resetField('showBars')}
+        overriddenLabel={t('overridden')}
+        resetLabel={t('reset')}
+        spaced
       />
     </PluginSettingsForm>
   )

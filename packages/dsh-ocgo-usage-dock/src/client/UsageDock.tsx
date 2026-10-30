@@ -1,5 +1,9 @@
 /** Usage row below the composer, on the line after the built-in token meter. */
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+import {
+  IconRefreshOutlineRegular,
+  IconSettingsOutlineRegular,
+} from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { UsageSnapshot, UsageWindow } from '@hmilyld/dsh-ocgo-usage-dock/types'
 import type { DockFace } from './controller.ts'
@@ -50,10 +54,12 @@ function WindowBar({
   window,
   label,
   t,
+  showBar,
 }: {
   window: UsageWindow
   label: string
   t: (key: OcgoLocaleKey) => string
+  showBar: boolean
 }) {
   const percent = window.percent
   const width = percent === null ? 0 : Math.min(100, Math.max(0, percent))
@@ -62,9 +68,11 @@ function WindowBar({
   return (
     <span style={styles.window} title={reset}>
       <span style={styles.windowLabel}>{label}</span>
-      <span style={styles.track}>
-        <span style={{ ...styles.fill, width: `${width}%`, background: color }} />
-      </span>
+      {showBar ? (
+        <span style={styles.track}>
+          <span style={{ ...styles.fill, width: `${width}%`, background: color }} />
+        </span>
+      ) : null}
       <span style={{ ...styles.percent, color }}>
         {percent === null ? '—' : `${Math.round(percent)}%`}
       </span>
@@ -82,7 +90,7 @@ function IconButton({
   label: string
   disabled?: boolean
   onClick: () => void
-  children: string
+  children: ReactNode
 }) {
   return (
     <button
@@ -125,9 +133,24 @@ export function UsageDock(props: UsageDockProps) {
           </span>
         ) : (
           <>
-            <WindowBar window={snapshot?.windows[0] ?? fallback('rolling')} label={t('windowRolling')} t={t} />
-            <WindowBar window={snapshot?.windows[1] ?? fallback('weekly')} label={t('windowWeekly')} t={t} />
-            <WindowBar window={snapshot?.windows[2] ?? fallback('monthly')} label={t('windowMonthly')} t={t} />
+            <WindowBar
+              window={snapshot?.windows[0] ?? fallback('rolling')}
+              label={t('windowRolling')}
+              t={t}
+              showBar={state.showBars}
+            />
+            <WindowBar
+              window={snapshot?.windows[1] ?? fallback('weekly')}
+              label={t('windowWeekly')}
+              t={t}
+              showBar={state.showBars}
+            />
+            <WindowBar
+              window={snapshot?.windows[2] ?? fallback('monthly')}
+              label={t('windowMonthly')}
+              t={t}
+              showBar={state.showBars}
+            />
           </>
         )}
         <span style={styles.controls}>
@@ -136,14 +159,14 @@ export function UsageDock(props: UsageDockProps) {
             disabled={state.loading}
             onClick={props.refresh}
           >
-            ⟳
+            <IconRefreshOutlineRegular size={14} />
           </IconButton>
           <span style={styles.gearWrap}>
             <IconButton
               label={update.updateAvailable ? t('updateChangelog') : t('openSettings')}
               onClick={props.openSettings}
             >
-              ⚙
+              <IconSettingsOutlineRegular size={14} />
             </IconButton>
             {update.updateAvailable ? <span style={styles.updateDot} aria-hidden="true" /> : null}
           </span>
@@ -165,7 +188,10 @@ const styles: Record<string, CSSProperties> = {
     width: '100%',
     flex: '1 0 100%',
     order: 10,
-    padding: '2px 12px 4px',
+    // The composer dock's own `gap: 12px` is the row gap between the built-in
+    // stats line and this row; the injected style sets `row-gap: 2px` so the
+    // two lines sit together instead of leaving a blank line between them.
+    padding: '0 12px 2px',
     minWidth: 0,
   },
   dock: {
@@ -233,9 +259,14 @@ const styles: Record<string, CSSProperties> = {
     background: 'transparent',
     color: 'var(--dsw-alias-label-secondary, #6b7280)',
     cursor: 'pointer',
-    padding: '0 2px',
-    fontSize: 14,
-    lineHeight: '18px',
+    // A fixed box keeps the two SVG controls identical on mobile, where the
+    // old ⚙/⟳ text glyphs picked up different emoji font metrics.
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 18,
+    height: 18,
+    padding: 0,
     borderRadius: 6,
   },
   gearWrap: {

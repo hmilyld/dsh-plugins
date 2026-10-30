@@ -35,6 +35,8 @@ export interface Config {
   timeoutMs: Volatile<number>
   /** Usage endpoint. */
   baseUrl: Volatile<string>
+  /** Whether each window draws its percentage bar. */
+  showBars: Volatile<boolean>
 }
 
 /** Schemastery schema for the plugin entry. */
@@ -61,5 +63,9 @@ export const Config = Schema.object({
   baseUrl: Schema.string()
     .default(DEFAULT_BASE_URL)
     .description('Usage endpoint URL.')
+    .volatile(),
+  showBars: Schema.boolean()
+    .default(true)
+    .description('Draw the per-window usage bars; turn off to keep only the percentages.')
     .volatile(),
 })

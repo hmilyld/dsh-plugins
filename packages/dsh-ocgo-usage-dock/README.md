@@ -14,7 +14,7 @@ OpenCode Go usage   5-hour ▓▓▓░░ 29%   Weekly ▓▓▓▓░ 84%   Mo
 - Health colors: < 60% green, 60–85% amber, ≥ 85% red.
 - With no key the row renders nothing; endpoint failures show an error and a retry control without interrupting the conversation.
 - Only OpenCode Go metadata is read; no model tokens are consumed.
-- Settings save live: refresh interval, timeout, and endpoint are all editable.
+- Settings save live: refresh interval, timeout, endpoint, and whether the per-window bars are drawn are all editable.
 
 ## Requirements
 
@@ -55,6 +55,7 @@ Open **Plugins → @hmilyld/dsh-ocgo-usage-dock**.
 | Refresh interval (seconds) | Poll interval, minimum 10, default 300. |
 | Request timeout (seconds) | Per-request limit, minimum 1, default 15. |
 | Usage endpoint | Defaults to `https://opencode.ai/zen/go/v1/usage`. |
+| Show usage bars | On by default. Turn it off to hide each window's horizontal bar and keep only the percentage numbers. |
 
 ### Key precedence
 
@@ -91,6 +92,10 @@ OpenCode Go reports an expired or unauthorized key. Create a new key in the Open
 **Settings do not take effect**
 
 Press **Save**. The Host invalidates its cache and the next request uses the new values; the dock itself may update on the next poll.
+
+**A newly added setting says “the deployment did not accept these values”**
+
+This is not a publishing problem. The browser half reloads on a page refresh, but the Host half keeps its `Config` schema in memory until `dsh web` restarts. After pulling or building a version that adds a setting, restart `dsh web` once; the new field is then accepted.
 
 ## Implementation
 

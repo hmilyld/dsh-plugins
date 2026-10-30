@@ -47,6 +47,8 @@ export type OcgoLocaleKey =
   | 'invalidTimeout'
   | 'baseUrl'
   | 'baseUrlHint'
+  | 'showBars'
+  | 'showBarsHint'
   | 'overridden'
   | 'reset'
   | 'readOnly'
@@ -100,6 +102,8 @@ export const en: Record<OcgoLocaleKey, string> = {
   invalidTimeout: 'Enter a whole number of seconds, 1 or greater.',
   baseUrl: 'Usage endpoint',
   baseUrlHint: 'Leave blank to use the default OpenCode Go usage endpoint.',
+  showBars: 'Show usage bars',
+  showBarsHint: 'Turn off to hide the per-window bars and keep only the percentage numbers.',
   overridden: 'Overridden',
   reset: 'Reset to default',
   readOnly: 'This deployment stores settings read-only.',
@@ -154,6 +158,8 @@ export const zh: Record<OcgoLocaleKey, string> = {
   invalidTimeout: '请填不小于 1 的整数秒数。',
   baseUrl: '用量接口地址',
   baseUrlHint: '留空使用 OpenCode Go 默认用量接口。',
+  showBars: '显示占比横条',
+  showBarsHint: '关闭后隐藏每个窗口的横条，仅保留百分比数字。',
   overridden: '已覆盖',
   reset: '恢复默认',
   readOnly: '本部署的设置为只读。',

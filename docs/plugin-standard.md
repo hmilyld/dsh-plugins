@@ -129,7 +129,7 @@ DSH_BUILD_FACE=client tsdown         → lib/client.js
 - Slot：
   - 设置卡片：`plugins.bundle.config`，key = 包名。
   - 输入框上方全宽横幅/队列：`conversation.input.dock`。
-  - 输入框下方 ambient 状态/用量：`conversation.composer.dock`（与官方 token 行同一容器；只在 resident composer 出现，hero 不渲染）。要让整行落在 token 用量下一行：注入 `[data-composer-dock]{flex-wrap:wrap}`，entry 设 `flex: 1 0 100%; order: 10`。
+  - 输入框下方 ambient 状态/用量：`conversation.composer.dock`（与官方 token 行同一容器；只在 resident composer 出现，hero 不渲染）。要让整行落在 token 用量下一行：注入 `[data-composer-dock]{flex-wrap:wrap;row-gap:2px}`，entry 设 `flex: 1 0 100%; order: 10`。官方先渲染该 slot、后渲染 `ContextMeter`，所以占比节点在 DOM 里仍是最后一个；只靠 `order` 调整视觉顺序，不要搬 DOM。
   - 一律先 `ctx.configForms.whileServed([ENTRY_ID], ...)`。
 - 一个客户端插件一个 controller，统一持有表单、credentials 状态、更新 store、唯一轮询。
 - 禁止 DOM portal / querySelector / 手写设置导航；用 `ctx.pluginNavigation.openBundle(PKG_NAME)`。

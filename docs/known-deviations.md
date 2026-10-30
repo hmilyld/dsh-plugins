@@ -33,6 +33,7 @@
 
 ## 6. `conversation.composer.dock` 换行样式
 
-- **偏差**：官方 composer dock 是单行 `display:flex`，没有 `flex-wrap`。用量条要落在自带 token 用量下一行，只能在插件里注入一条 `[data-composer-dock]{flex-wrap:wrap}`。
-- **处理**：样式只作用于官方稳定 data 属性，插件卸载时移除；entry 使用 `flex: 1 0 100%; order: 10` 占满下一行。
+- **偏差**：官方 composer dock 是单行 `display:flex`，没有 `flex-wrap`。用量条要落在自带 token 用量下一行，只能在插件里注入一条 `[data-composer-dock]{flex-wrap:wrap;row-gap:2px}`。
+- **处理**：样式只作用于官方稳定 data 属性，插件卸载时移除；entry 使用 `flex: 1 0 100%; order: 10` 占满下一行。`row-gap` 必须收紧，否则 dock 自身的 `gap: 12px` 会在两行之间留出一条空行。
+- **DOM 顺序**：官方 `InputBar` 先渲染 `conversation.composer.dock`，再渲染内置 `ContextMeter`，所以上下文占比始终是 dock 的最后一个 DOM 子节点；插件行靠 CSS `order` 排在它后面。不要用 DOM portal / querySelector 去搬节点。
 - **复核**：若官方后续提供多行 composer dock 或独立“below token meter”slot，删除这条注入。

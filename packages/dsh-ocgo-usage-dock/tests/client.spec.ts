@@ -28,6 +28,9 @@ describe('client bundle', () => {
           SettingsFormModel: class {},
           SettingsValueField: () => null,
           SettingsSecretField: () => null,
+          Switch: () => null,
+          IconRefreshOutlineRegular: () => null,
+          IconSettingsOutlineRegular: () => null,
           settingsTextField: () => ({ field: '', format: () => '', parse: () => undefined }),
         },
       }
@@ -48,6 +51,6 @@ describe('client bundle', () => {
     expect(source).toContain('registry.npmjs.org')
     expect(source).toContain('blob/main/packages/dsh-ocgo-usage-dock/CHANGELOG.md')
     expect(source).toContain('conversation.composer.dock')
-    expect(source).toContain('[data-composer-dock]{flex-wrap:wrap}')
+    expect(source).toContain('[data-composer-dock]{flex-wrap:wrap;row-gap:2px}')
   })
 })

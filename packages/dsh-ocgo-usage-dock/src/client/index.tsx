@@ -54,10 +54,15 @@ function mountUi(ctx: Context): void {
   const controller = new OcgoClientController(ctx)
   // The official composer dock is a single non-wrapping flex row. Let it wrap
   // so the full-width usage row can sit on the line below the token meter.
+  //
+  // The official tree renders this slot BEFORE the built-in ContextMeter, so
+  // the meter stays the dock's last DOM child. `order: 10` on the row (see
+  // UsageDock) is what puts it after the meter visually; the dock's `gap`
+  // would otherwise leave a blank line, hence the tighter row gap.
   ctx.effect(() => {
     const style = document.createElement('style')
     style.dataset.ocgoUsageDock = ''
-    style.textContent = '[data-composer-dock]{flex-wrap:wrap}'
+    style.textContent = '[data-composer-dock]{flex-wrap:wrap;row-gap:2px}'
     document.head.appendChild(style)
     return () => style.remove()
   }, 'ocgo-usage-dock: composer dock wrap')
