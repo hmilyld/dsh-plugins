@@ -74,6 +74,17 @@ interface SessionListLike {
   refresh?(): Promise<void>
 }
 
+/** Minimal face of the Client Session manager used to repair one row title. */
+interface SessionProjectionLike {
+  refreshProjections?(sessionId: string): Promise<void>
+}
+
+/** The row mark's injected face. */
+export interface MarkFace {
+  /** Load one row's projections so a missing title appears. */
+  requestTitleRepair: (sessionId: string) => void
+}
+
 /** The settings card's injected face. */
 export interface Face extends SettingsFormActions {
   hooks: {
@@ -140,6 +151,9 @@ export class ImportClientController {
   private pollTimer: ReturnType<typeof setInterval> | undefined
   private workspaceUnsubscribe: (() => void) | undefined
   private importedBaseline: number | undefined
+  private readonly titleRepairs = new Set<string>()
+  private readonly titleRepairQueue: string[] = []
+  private titleRepairActive = 0
   private disposed = false
 
   /**
@@ -165,6 +179,48 @@ export class ImportClientController {
     void this.refreshPreview()
     this.watchWorkspaceAdditions()
     this.startImportedPoll()
+  }
+
+  /**
+   * Ask the Host for one Session's projections when its row has no title.
+   *
+   * DSH binds a cached projection record to the header identity, and that
+   * identity includes `cwd`; a directory move rewrites the stored header while
+   * the cache keeps the old path, so `session/list` drops every hint for the
+   * session and the row reads "Untitled" until something loads its projections.
+   * Reading them once here restores the title (and the client keeps it).
+   *
+   * @param sessionId - the row's Session identity.
+   */
+  requestTitleRepair(sessionId: string): void {
+    if (this.disposed || this.titleRepairs.has(sessionId)) return
+    const sessions = (this.ctx as unknown as { sessions?: SessionProjectionLike }).sessions
+    if (sessions?.refreshProjections === undefined) return
+    this.titleRepairs.add(sessionId)
+    this.titleRepairQueue.push(sessionId)
+    this.pumpTitleRepairs()
+  }
+
+  /** Drain the repair queue a few at a time so a long list cannot stampede the Host. */
+  private pumpTitleRepairs(): void {
+    const sessions = (this.ctx as unknown as { sessions?: SessionProjectionLike }).sessions
+    const refresh = sessions?.refreshProjections
+    if (refresh === undefined) return
+    while (this.titleRepairActive < 3 && this.titleRepairQueue.length > 0) {
+      const sessionId = this.titleRepairQueue.shift()
+      if (sessionId === undefined) break
+      this.titleRepairActive += 1
+      void Promise.resolve()
+        .then(() => refresh.call(sessions, sessionId))
+        .catch(() => {
+          // Allow one retry on a later mount; a permanent failure stays quiet.
+          this.titleRepairs.delete(sessionId)
+        })
+        .finally(() => {
+          this.titleRepairActive -= 1
+          this.pumpTitleRepairs()
+        })
+    }
   }
 
   /** The settings card's injected face. */

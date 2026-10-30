@@ -85,6 +85,10 @@ dsh plugin --profile web add /absolute/path/to/DSHPlugins/packages/dsh-opencode-
 | `maxMessagesPerSession` | `0` | 只保留最新 N 条对话消息；`0` 全部保留 |
 | `excludedDirectories` | `[]` | 不导入其下会话的绝对路径 |
 
+## 侧栏标题
+
+侧栏标题来自投影缓存提示。DSH 用会话 header 身份（含 `cwd`）绑定缓存记录；目录迁移会改写 header，而缓存仍保留旧路径，`session/list` 就会丢弃这些会话的提示，行标题显示“未命名”，直到有人加载它们的投影。插件的侧栏标记会读取每个已渲染行的标题，缺失时向 Host 请求该会话的投影，这些行会自行补全，不需要逐个点开。
+
 ## 已知限制
 
 - **单向快照**：每个 OpenCode 会话只导入一次，之后 OpenCode 新增的消息不会进入 DSH 副本。

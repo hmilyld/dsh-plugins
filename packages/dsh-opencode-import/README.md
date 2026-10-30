@@ -85,6 +85,10 @@ If any step fails, the failure is contained to that one session and reported; th
 | `maxMessagesPerSession` | `0` | Keep the newest N conversation messages; `0` keeps all |
 | `excludedDirectories` | `[]` | Absolute directories whose sessions are never imported |
 
+## Row titles
+
+The sidebar row title is a cached projection hint. DSH binds a cached record to the session header identity, and that identity includes `cwd`; moving a workspace directory rewrites stored headers while the projection cache keeps the old path, so `session/list` drops every hint for those sessions and their rows read "Untitled" until something loads their projections. The plugin's row decoration reads each rendered row's title and asks the Host for that one session's projections when it is missing, so those rows fill in on their own instead of requiring a click per session.
+
 ## Limitations
 
 - **One-way snapshot.** The import runs once per OpenCode session; later OpenCode messages do not flow into the DSH copy.

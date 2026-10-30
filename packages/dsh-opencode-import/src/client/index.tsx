@@ -64,6 +64,9 @@ function mountUi(ctx: Context): void {
           id: 'opencode-import',
           order: 5,
           locale: NS,
+          inject: () => ({
+            requestTitleRepair: (sessionId: string) => controller.requestTitleRepair(sessionId),
+          }),
         },
         ImportedMark,
       ),

@@ -1,5 +1,15 @@
 # @hmilyld/dsh-opencode-import
 
+## 0.1.2
+
+### Patch Changes
+
+- 侧栏标题自愈：行标题缺失时（典型场景是工作区目录迁移后，投影缓存的 `cwd` 身份与日志 header 失配，
+  列表提示被丢弃）自动向 Host 请求该会话的投影，标题逐行补全，不再需要逐个点开会话。
+  每个会话每页面只请求一次，队列并发 3。
+- 文档补充标题来源与失配原因（README / README.zh.md）。
+- 构建依赖补充 `@deepseek-ai/dsh-client-ui-session`（`useSessions` 类型增强）。
+
 ## 0.1.1
 
 ### Patch Changes

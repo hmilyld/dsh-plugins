@@ -1,21 +1,39 @@
 /** Leading mark shown on a session row this plugin imported. */
-import type { CSSProperties } from 'react'
+import { useEffect, type CSSProperties } from 'react'
+import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
-import type { PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
+import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import { SESSION_ID_PREFIX } from './constants.ts'
+import type { MarkFace } from './controller.ts'
 import { NS, type LocaleKey } from './locales.ts'
 
 export type ImportedMarkProps = PropsRuntime<'sidebar.session.row.leading'> &
-  PropsLocale<typeof NS>
+  PropsLocale<typeof NS> &
+  InjectFace<MarkFace>
 
 /**
  * Render the OpenCode badge for imported rows only.
  *
- * @param props - the row's session identity and the card's dictionary.
+ * The seat is mounted for every idle row, so it also doubles as the title
+ * self-heal hook: a row whose cached projection record no longer matches its
+ * header (for example after the workspace directory moved) has no title hint
+ * and reads "Untitled" until something loads its projections.
+ *
+ * @param props - the row's session identity, its title selector, and the face.
  * @returns the 16px cell content, or null for ordinary sessions.
  */
 export function ImportedMark(props: ImportedMarkProps) {
-  if (typeof props.sessionId !== 'string' || !props.sessionId.startsWith(SESSION_ID_PREFIX)) {
+  const sessionId = props.sessionId
+  const title = props.useSessions((state) => {
+    const hinted = state.byId[sessionId]?.projections?.values.title
+    const read = state.projectionsBySession[sessionId]?.values.title
+    return hinted ?? read
+  })
+  const missing = typeof title !== 'string' || title.length === 0
+  useEffect(() => {
+    if (missing && typeof sessionId === 'string') props.requestTitleRepair(sessionId)
+  }, [missing, sessionId])
+  if (typeof sessionId !== 'string' || !sessionId.startsWith(SESSION_ID_PREFIX)) {
     return null
   }
   const t = props.t as (key: LocaleKey) => string
