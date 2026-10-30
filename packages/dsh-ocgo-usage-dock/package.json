@@ -1,6 +1,6 @@
 {
   "name": "@hmilyld/dsh-ocgo-usage-dock",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "DSH (DeepSeek Harness) web dock showing OpenCode Go rolling, weekly, and monthly usage, with a credential-backed settings page.",
   "type": "module",
   "main": "lib/index.js",
